@@ -1,0 +1,99 @@
+/*
+ * Copyright (C) 2016 Florian Stober
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+buildscript {
+    dependencies {
+        classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
+    }
+    repositories {
+        maven {
+            url "http://repository.jboss.org/nexus/content/groups/public/"
+        }
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+plugins {
+    id "com.github.johnrengelman.shadow" version "1.2.3"
+}
+
+group 'de.codecrafter47.taboverlay'
+version '0.2.1-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'maven-publish-auth'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+    }
+    maven {
+        url "http://nexus.codecrafter47.dyndns.eu/content/repositories/public/"
+    }
+    maven {
+        url "http://repo.dmulloy2.net/nexus/repository/public/"
+    }
+}
+
+dependencies {
+    compileOnly "org.projectlombok:lombok:1.16.12"
+    compileOnly "com.google.code.findbugs:jsr305:3.0.1"
+    compileOnly "org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT"
+    compileOnly "io.netty:netty-all:4.1.9.Final"
+    compileOnly "com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT"
+    compile "de.codecrafter47.taboverlay:TabOverlayCommon:0.2.1-SNAPSHOT"
+    compile "de.codecrafter47.data:bukkit:1.0.2-SNAPSHOT"
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    repositories {
+        maven {
+            name "deployment"
+            url "http://nexus.codecrafter47.dyndns.eu/content/repositories/snapshots/"
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+}
+
+processResources {
+    filesMatching("plugin.yml") {
+        expand(project.properties)
+    }
+}
+
+shadowJar {
+    classifier = null
+}

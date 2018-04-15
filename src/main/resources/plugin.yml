@@ -1,0 +1,9 @@
+name: ${name}
+version: ${version}
+main: de.codecrafter47.taboverlay.bukkit.AdvancedTabOverlay
+author: CodeCrafter47
+description: |
+  Allows to customize the tab overlay.
+depend: ["ProtocolLib"]
+softdepend: []
+commands: {}
