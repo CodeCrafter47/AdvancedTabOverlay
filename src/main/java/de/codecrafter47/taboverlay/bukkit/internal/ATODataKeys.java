@@ -10,4 +10,5 @@ public class ATODataKeys {
 
     public final static DataKey<Icon> ICON = new DataKey<>("ato:icon", MinecraftData.SCOPE_PLAYER, TYPE_TOKEN_ICON);
     public final static DataKey<Integer> PING = new DataKey<>("ato:ping", MinecraftData.SCOPE_PLAYER, TypeToken.INTEGER);
+    public final static DataKey<Boolean> HIDDEN = new DataKey<>("ato:hidden", MinecraftData.SCOPE_PLAYER, TypeToken.BOOLEAN);
 }

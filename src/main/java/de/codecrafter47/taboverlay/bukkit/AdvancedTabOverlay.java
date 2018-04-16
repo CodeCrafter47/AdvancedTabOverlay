@@ -1,6 +1,7 @@
 package de.codecrafter47.taboverlay.bukkit;
 
 import com.google.common.collect.ImmutableSet;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.bukkit.internal.ATODataKeys;
 import de.codecrafter47.taboverlay.bukkit.internal.DataManager;
@@ -113,6 +114,8 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                 ConfigTabOverlayManager.Options.createBuilderWithDefaults()
                         .playerIconDataKey(ATODataKeys.ICON)
                         .playerPingDataKey(ATODataKeys.PING)
+                        .playerInvisibleDataKey(ATODataKeys.HIDDEN)
+                        .playerCanSeeInvisibleDataKey(MinecraftData.permission("advancedtaboverlay.seehidden"))
                         .build(),
                 getLogger(),
                 tabEventQueue,

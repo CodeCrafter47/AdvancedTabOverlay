@@ -7,6 +7,8 @@ import com.comphenix.protocol.utility.MinecraftReflection;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import de.codecrafter47.data.bukkit.AbstractBukkitDataAccess;
+import de.codecrafter47.data.bukkit.PlayerDataAccess;
+import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import lombok.SneakyThrows;
@@ -19,12 +21,15 @@ import java.util.logging.Logger;
 public class ATODataAccess extends AbstractBukkitDataAccess<Player> {
 
     private static FieldAccessor PING;
+    private final PlayerDataAccess playerDataAccess;
 
     public ATODataAccess(Logger logger, Plugin plugin) {
         super(logger, plugin);
 
         addProvider(ATODataKeys.PING, ATODataAccess::getPlayerPing);
         addProvider(ATODataKeys.ICON, ATODataAccess::getPlayerIcon);
+        addProvider(ATODataKeys.HIDDEN, this::isPlayerInvisible);
+        playerDataAccess = new PlayerDataAccess(plugin);
     }
 
     private static Icon getPlayerIcon(Player player) {
@@ -49,5 +54,15 @@ public class ATODataAccess extends AbstractBukkitDataAccess<Player> {
         }
         Object nmsPlayer = BukkitUnwrapper.getInstance().unwrapItem(player);
         return (Integer) PING.get(nmsPlayer);
+    }
+
+    private Boolean isPlayerInvisible(Player player) {
+        if (Boolean.TRUE.equals(playerDataAccess.get(BukkitData.Essentials_IsVanished, player)))
+            return true;
+        if (Boolean.TRUE.equals(playerDataAccess.get(BukkitData.SuperVanish_IsVanished, player)))
+            return true;
+        if (Boolean.TRUE.equals(playerDataAccess.get(BukkitData.VanishNoPacket_IsVanished, player)))
+            return true;
+        return false;
     }
 }

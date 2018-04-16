@@ -6,6 +6,7 @@ import de.codecrafter47.data.bukkit.PlayerDataAccess;
 import de.codecrafter47.taboverlay.bukkit.AdvancedTabOverlay;
 import de.codecrafter47.taboverlay.util.Unchecked;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
@@ -52,7 +53,7 @@ public class DataManager {
         dataHolderSet.remove(dataHolder);
     }
 
-    static class PlayerDataHolder extends DataCache {
+    class PlayerDataHolder extends DataCache {
 
         private Set<DataKey<?>> activeKeys = Sets.newConcurrentHashSet();
 
@@ -80,7 +81,8 @@ public class DataManager {
 
         @Override
         public <V> V get(DataKey<V> key) {
-            if (!activeKeys.contains(key)) {
+            // todo remove this safety check for performance reasons
+            if (!activeKeys.contains(key) && plugin.getTabEventQueue().inEventLoop()) {
                 throw new IllegalStateException("No listener registered for datakey " + key);
             }
             return super.get(key);
@@ -89,6 +91,7 @@ public class DataManager {
         @Override
         public <T> void addDataChangeListener(DataKey<T> key, Runnable listener) {
             super.addDataChangeListener(key, listener);
+            // todo query data immediately if key is requested for the first time
             activeKeys.add(key);
         }
 
