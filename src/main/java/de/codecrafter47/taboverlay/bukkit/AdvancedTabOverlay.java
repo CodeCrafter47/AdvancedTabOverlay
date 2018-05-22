@@ -3,11 +3,8 @@ package de.codecrafter47.taboverlay.bukkit;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.taboverlay.TabView;
-import de.codecrafter47.taboverlay.bukkit.internal.ATODataKeys;
-import de.codecrafter47.taboverlay.bukkit.internal.DataManager;
-import de.codecrafter47.taboverlay.bukkit.internal.DefaultTabOverlayHandlerFactory;
-import de.codecrafter47.taboverlay.bukkit.internal.PlayerManager;
-import de.codecrafter47.taboverlay.bukkit.internal.PlayerPlaceholderResolver;
+import de.codecrafter47.taboverlay.bukkit.internal.*;
+import de.codecrafter47.taboverlay.bukkit.internal.util.Completer;
 import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
 import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
@@ -64,6 +61,8 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     @Override
     @SneakyThrows // todo catch exceptions
     public void onEnable() {
+        getCommand("ato").setExecutor(new ATOCommand());
+        getCommand("ato").setTabCompleter(Completer.create().any("reload", "info"));
         Executor executor = (task) -> getServer().getScheduler().runTaskAsynchronously(this, task);
         asyncExecutor = new MultithreadEventExecutorGroup(4, executor) {
             @Override
@@ -167,6 +166,11 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
 
     public TabView getTabView(Player player) {
         return playerTabViewMap.get(player);
+    }
+
+    public void reload() {
+        Path tabLists = getDataFolder().toPath().resolve("tabLists");
+        configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
     }
 
     private final class MyPlatform implements Platform {

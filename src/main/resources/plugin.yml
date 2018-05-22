@@ -6,4 +6,9 @@ description: |
   Allows to customize the tab overlay.
 depend: ["ProtocolLib"]
 softdepend: []
-commands: {}
+commands:
+  ato:
+    aliases: ["advancedtaboverlay"]
+    description: Administrative command of AdvanceTabOverlay
+    permission: advancedtaboverlay.admin
+    usage: /ato [info|reload]
