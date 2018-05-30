@@ -66,7 +66,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         Executor executor = (task) -> getServer().getScheduler().runTaskAsynchronously(this, task);
         asyncExecutor = new MultithreadEventExecutorGroup(4, executor) {
             @Override
-            protected EventExecutor newChild(Executor executor, Object... args) throws Exception {
+            protected EventExecutor newChild(Executor executor, Object... args) {
                 return new DefaultEventExecutor(this, executor, 512, RejectedExecutionHandlers.reject());
             }
         };
@@ -125,21 +125,32 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
         getServer().getPluginManager().registerEvents(this, this);
         dataManager.enable();
+
+        for (Player player : getServer().getOnlinePlayers()) {
+            addPlayer(player);
+        }
+
     }
 
     @Override
     public void onDisable() {
-        // todo shut down gracefully & prevent major damage by reload plugins
         asyncExecutor.shutdownGracefully();
         tabEventQueue.shutdownGracefully();
+
+        tabOverlayHandlerFactory.onDisable();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        de.codecrafter47.taboverlay.config.player.Player player = playerManager.onPlayerJoin(event.getPlayer());
-        TabView tabView = new TabView(tabOverlayHandlerFactory.create(event.getPlayer()), getLogger(), asyncExecutor);
-        playerTabViewMap.put(event.getPlayer(), tabView);
-        tabOverlayHandlerFactory.onCreated(tabView, event.getPlayer());
+        Player bukkitPlayer = event.getPlayer();
+        addPlayer(bukkitPlayer);
+    }
+
+    private void addPlayer(Player bukkitPlayer) {
+        de.codecrafter47.taboverlay.config.player.Player player = playerManager.onPlayerJoin(bukkitPlayer);
+        TabView tabView = new TabView(tabOverlayHandlerFactory.create(bukkitPlayer), getLogger(), asyncExecutor);
+        playerTabViewMap.put(bukkitPlayer, tabView);
+        tabOverlayHandlerFactory.onCreated(tabView, bukkitPlayer);
         if (listener != null) {
             listener.onTabViewAdded(tabView, player);
         }

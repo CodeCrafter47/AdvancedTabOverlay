@@ -9,4 +9,6 @@ public interface TabOverlayHandlerFactory {
     TabOverlayHandler create(Player player);
 
     void onCreated(TabView tabView, Player player);
+
+    void onDisable();
 }

@@ -9,6 +9,7 @@ import de.codecrafter47.taboverlay.bukkit.AdvancedTabOverlay;
 import de.codecrafter47.taboverlay.bukkit.TabOverlayHandlerFactory;
 import de.codecrafter47.taboverlay.bukkit.internal.util.UnorderedPair;
 import de.codecrafter47.taboverlay.bukkit.internal.util.Util;
+import de.codecrafter47.taboverlay.handler.OperationMode;
 import de.codecrafter47.taboverlay.handler.TabOverlayHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -108,6 +109,13 @@ public class DefaultTabOverlayHandlerFactory implements TabOverlayHandlerFactory
         val playerTabOverlayHandler = tabOverlayHandlerMap.get(player);
         playerTabOverlayHandler.handler = new PassthroughPriorFirstMoveHandler(playerTabOverlayHandler, tabView);
         tabView.getTabOverlayProviders().addProvider(playerTabOverlayHandler.handler);
+    }
+
+    @Override
+    public void onDisable() {
+        for (DefaultTabOverlayHandler handler : tabOverlayHandlerMap.values()) {
+            handler.enterOperationMode(OperationMode.PASS_TROUGH);
+        }
     }
 
     @RequiredArgsConstructor
