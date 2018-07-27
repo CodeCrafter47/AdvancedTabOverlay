@@ -51,6 +51,8 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     private PlayerManager playerManager;
     @Getter
     private DataManager dataManager;
+    @Getter
+    private DefaultIconManager iconManager;
 
     @Override
     public void onLoad() {
@@ -107,6 +109,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
             }
         }
 
+        iconManager = new DefaultIconManager(asyncExecutor, tabEventQueue, getDataFolder().toPath().resolve("icons"), getLogger());
         configTabOverlayManager = new ConfigTabOverlayManager(new MyPlatform(),
                 playerManager,
                 new PlayerPlaceholderResolver(),
@@ -118,7 +121,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                         .build(),
                 getLogger(),
                 tabEventQueue,
-                new DefaultIconManager(asyncExecutor, tabEventQueue, getDataFolder().toPath().resolve("icons"), getLogger()));
+                iconManager);
 
         Path tabLists = getDataFolder().toPath().resolve("tabLists");
         Files.createDirectories(tabLists);
