@@ -2,52 +2,30 @@ showTo: all
 priority: 0
 
 showHeaderFooter: true
-
-header:
-- '&cWelcome &f${viewer name}'
-- '&eW&celcome &f${viewer name}'
-- '&eWe&clcome &f${viewer name}'
-- '&eWel&ccome &f${viewer name}'
-- '&eWelc&come &f${viewer name}'
-- '&eWelco&cme &f${viewer name}'
-- '&eWelcom&ce &f${viewer name}'
-- '&eWelcome &f${viewer name}'
-- '&cW&eelcome &f${viewer name}'
-- '&cWe&elcome &f${viewer name}'
-- '&cWel&ecome &f${viewer name}'
-- '&cWelc&eome &f${viewer name}'
-- '&cWelco&eme &f${viewer name}'
-- '&cWelcom&ee &f${viewer name}'
-- '&cWelcome &f${viewer name}'
-
-headerAnimationUpdateInterval: 0.2
-
-footer:
-- |-
-  &aSome &b&lLong &cText &dHere &aSome &b&lLong &cText &dHere &aSome &b&lLong &cText &dHere &aSome &b&lLong
-
-footerAnimationUpdateInterval: 0.5
+header: "&cWelcome &f${viewer name}"
+footer: "&f&nPowered by AdvancedTabOverlay"
 
 customPlaceholders:
   afk_tag:
     !conditional
     condition: ${player essentials_afk}
-    true: '&7|&oaway'
-    false: ''
+    true: "&7|&oaway"
+    false: ""
   viewer_colored_ping0:
     !conditional
-    condition: "${viewer ping} < 50"
+    condition: ${viewer ping} < 50
     true: "&a${viewer ping}"
     false: "&e${viewer ping}"
   viewer_colored_ping:
     !conditional
-    condition: "${viewer ping} < 150"
+    condition: ${viewer ping} < 150
     true: ${viewer_colored_ping0}
     false: "&c${viewer ping}"
 
+hiddenPlayers: VISIBLE_TO_ADMINS
+
 playerSets:
-  all_players:
-    filter: true
+  all_players: all
 
 type: FIXED_SIZE
 size: 60
@@ -64,9 +42,10 @@ components:
 -
 - !players
   playerSet: all_players
+  playerOrder: vault_primary_group_weight asc, name
   playerComponent: "${player vault_prefix}${player name}${afk_tag}"
   morePlayersComponent: {text: "&7... and &e${other_count} &7others", icon: "colors/gray.png", ping: 0}
-- !spacer {}
+- !spacer
 - 
 - 
 -
