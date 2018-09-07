@@ -44,6 +44,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("vault_prefix", create(MinecraftData.Permissions_Prefix));
         addPlaceholder("vault_suffix", create(MinecraftData.Permissions_Suffix));
         addPlaceholder("vault_primary_group_prefix", create(MinecraftData.Permissions_PrimaryGroupPrefix));
+        addPlaceholder("vault_primary_group_weight", create(MinecraftData.Permissions_PermissionGroupWeight));
         addPlaceholder("vault_player_prefix", create(MinecraftData.Permissions_PlayerPrefix));
         addPlaceholder("health", create(MinecraftData.Health));
         addPlaceholder("max_health", create(MinecraftData.MaxHealth));
