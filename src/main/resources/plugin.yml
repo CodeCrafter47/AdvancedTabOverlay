@@ -5,7 +5,7 @@ author: CodeCrafter47
 description: |
   Allows to customize the tab overlay.
 depend: ["ProtocolLib"]
-softdepend: []
+softdepend: ["PlaceholderAPI"]
 commands:
   ato:
     aliases: ["advancedtaboverlay"]

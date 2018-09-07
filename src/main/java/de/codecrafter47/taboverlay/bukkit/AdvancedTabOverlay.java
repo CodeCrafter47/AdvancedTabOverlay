@@ -110,9 +110,13 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         }
 
         iconManager = new DefaultIconManager(asyncExecutor, tabEventQueue, getDataFolder().toPath().resolve("icons"), getLogger());
+        boolean hasPlaceholderAPI = getServer().getPluginManager().getPlugin("PlaceholderAPI") != null;
+
         configTabOverlayManager = new ConfigTabOverlayManager(new MyPlatform(),
                 playerManager,
-                new PlayerPlaceholderResolver(),
+                hasPlaceholderAPI
+                        ? new PAPIAwarePlayerPlaceholderResolver()
+                        : new PlayerPlaceholderResolver(),
                 ConfigTabOverlayManager.Options.createBuilderWithDefaults()
                         .playerIconDataKey(ATODataKeys.ICON)
                         .playerPingDataKey(ATODataKeys.PING)

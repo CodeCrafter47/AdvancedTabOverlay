@@ -25,12 +25,22 @@ public class DataManager {
     }
 
     public void enable() {
-        playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ATODataAccess(plugin.getLogger(), plugin));
+        boolean hasPlaceholderAPI = plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null;
+        if (hasPlaceholderAPI) {
+            playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ATODataAccess(plugin.getLogger(), plugin), new PAPIDataAccess(plugin.getLogger(), plugin));
+        } else {
+            playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ATODataAccess(plugin.getLogger(), plugin));
+        }
         plugin.getAsyncExecutor().scheduleWithFixedDelay(this::updateData, 1, 1, TimeUnit.SECONDS);
     }
 
     public void updateHooks() {
-        playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ATODataAccess(plugin.getLogger(), plugin));
+        boolean hasPlaceholderAPI = plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null;
+        if (hasPlaceholderAPI) {
+            playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ATODataAccess(plugin.getLogger(), plugin), new PAPIDataAccess(plugin.getLogger(), plugin));
+        } else {
+            playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ATODataAccess(plugin.getLogger(), plugin));
+        }
     }
 
     private void updateData() {
