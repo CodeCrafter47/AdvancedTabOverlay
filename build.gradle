@@ -33,7 +33,7 @@ plugins {
 }
 
 group 'de.codecrafter47.taboverlay'
-version '0.2.3-SNAPSHOT'
+version '0.3-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -62,7 +62,7 @@ dependencies {
     compileOnly "io.netty:netty-all:4.1.9.Final"
     compileOnly "com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT"
     compileOnly "me.clip.placeholderapi:PlaceholderAPI:1.8.5"
-    compile "de.codecrafter47.taboverlay:TabOverlayCommon:0.2.2-SNAPSHOT"
+    compile "de.codecrafter47.taboverlay:TabOverlayCommon:0.3-SNAPSHOT"
     compile "de.codecrafter47.data:bukkit:1.0.2-SNAPSHOT"
 }
 
