@@ -63,7 +63,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         // todo addPlaceholder("session_duration_minutes", create(TypeToken.INTEGER, BungeeData.BungeeCord_SessionDuration, duration -> (int) ((duration.getSeconds() % 3600) / 60), null, null));
         // todo addPlaceholder("session_duration_hours", create(TypeToken.INTEGER, BungeeData.BungeeCord_SessionDuration, duration -> (int) (duration.getSeconds() / 3600), null, null));
         addPlaceholder("essentials_afk", create(BukkitData.Essentials_IsAFK, player -> false, null));
-        // todo bind to data key addPlaceholder("is_hidden", ofFunction(p -> Boolean.toString(BungeeTabListPlus.isHidden(p))));
+        addPlaceholder("is_hidden", create(ATODataKeys.HIDDEN));
         // todo addPlaceholder("gamemode", create(MinecraftData.DATA_KEY_GAMEMODE));
         addPlaceholder("askyblock_island_level", create(BukkitData.ASkyBlock_IslandLevel));
         addPlaceholder("askyblock_island_name", create(BukkitData.ASkyBlock_IslandName));

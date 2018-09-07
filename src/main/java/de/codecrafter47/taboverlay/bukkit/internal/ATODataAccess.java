@@ -57,6 +57,8 @@ public class ATODataAccess extends AbstractBukkitDataAccess<Player> {
     }
 
     private Boolean isPlayerInvisible(Player player) {
+        if (Boolean.TRUE.equals(playerDataAccess.get(BukkitData.CMI_IsVanished, player)))
+            return true;
         if (Boolean.TRUE.equals(playerDataAccess.get(BukkitData.Essentials_IsVanished, player)))
             return true;
         if (Boolean.TRUE.equals(playerDataAccess.get(BukkitData.SuperVanish_IsVanished, player)))
