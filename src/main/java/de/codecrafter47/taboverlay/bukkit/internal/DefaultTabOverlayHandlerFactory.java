@@ -69,12 +69,12 @@ public class DefaultTabOverlayHandlerFactory implements TabOverlayHandlerFactory
                     if (distance < 100) {
                         if (distance < lastD && lastD - distance > 20) {
                             if (a.canSee(b)) {
-                                a.hidePlayer(plugin, b);
-                                a.showPlayer(plugin, b);
+                                a.hidePlayer(b);
+                                a.showPlayer(b);
                             }
                             if (b.canSee(a)) {
-                                b.hidePlayer(plugin, a);
-                                b.showPlayer(plugin, a);
+                                b.hidePlayer(a);
+                                b.showPlayer(a);
                             }
                             lastDistance.put(key, distance);
                         }
