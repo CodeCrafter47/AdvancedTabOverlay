@@ -100,13 +100,6 @@ public class DataManager {
 
         @Override
         public <T> void addDataChangeListener(DataKey<T> key, Runnable listener) {
-            if (!hasListeners(key)) {
-                try {
-                    super.updateValue(key, playerDataAccess.get(key, player));
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-            }
             super.addDataChangeListener(key, listener);
             activeKeys.add(key);
         }
