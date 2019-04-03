@@ -35,7 +35,8 @@ public class DefaultTabOverlayHandler implements TabOverlayHandler {
 
     boolean active = false;
     PassthroughPriorFirstMoveHandler handler = null;
-    private OperationModeHandler<?> operationModeHandler = new PassthroughOperationModeHandler();
+    private OperationModeHandler<?> contentOperationModeHandler = new PassthroughOperationModeHandler();
+    private OperationModeHandler<?> headerAndFooterOperationModeHandler = new PassthroughOperationModeHandler();
 
     private final static Map<Integer, RectangularTabOverlay.Dimension> SUPPORTED_DIMENSIONS;
 
@@ -62,33 +63,47 @@ public class DefaultTabOverlayHandler implements TabOverlayHandler {
     }
 
     boolean onPacketSending(ChannelHandlerContext ctx, PacketContainer packet) {
-        return operationModeHandler.onPacketSending(ctx, packet);
+        return contentOperationModeHandler.onPacketSending(ctx, packet)
+                & headerAndFooterOperationModeHandler.onPacketSending(ctx, packet);
     }
 
     void tick() {
-        operationModeHandler.tick();
+        contentOperationModeHandler.tick();
+        headerAndFooterOperationModeHandler.tick();
     }
 
     @Override
-    public <R> R enterOperationMode(OperationMode<R> operationMode) {
+    public <R> R enterContentOperationMode(ContentOperationMode<R> operationMode) {
         OperationModeHandler newHandler;
-        if (operationMode == OperationMode.PASS_TROUGH) {
+        if (operationMode == ContentOperationMode.PASS_TROUGH) {
             newHandler = new PassthroughOperationModeHandler();
-        } else if (operationMode == OperationMode.RECTANGULAR) {
+        } else if (operationMode == ContentOperationMode.RECTANGULAR) {
             newHandler = new FixedSizeOperationModeHandler();
-        } else if (operationMode == OperationMode.RECTANGULAR_WITH_HEADER_AND_FOOTER) {
-            newHandler = new FixedSizeOperationModeHandler();
-        } else if (operationMode == OperationMode.SIMPLE) {
-            newHandler = new SimpleOperationModeHandler();
-        } else if (operationMode == OperationMode.SIMPLE_WITH_HEADER_AND_FOOTER) {
+        } else if (operationMode == ContentOperationMode.SIMPLE) {
             newHandler = new SimpleOperationModeHandler();
         } else {
             throw new UnsupportedOperationException("Unsupported Operation mode " + operationMode.getName());
         }
-        operationModeHandler.onDeactivated();
+        contentOperationModeHandler.onDeactivated();
         newHandler.onActivated();
-        operationModeHandler = newHandler;
-        return Unchecked.cast(operationModeHandler.getRepresentation());
+        contentOperationModeHandler = newHandler;
+        return Unchecked.cast(contentOperationModeHandler.getRepresentation());
+    }
+
+    @Override
+    public <R> R enterHeaderAndFooterOperationMode(HeaderAndFooterOperationMode<R> operationMode) {
+        OperationModeHandler newHandler;
+        if (operationMode == HeaderAndFooterOperationMode.PASS_TROUGH) {
+            newHandler = new HeaderAndFooterPassthroughOperationModeHandler();
+        } else if (operationMode == HeaderAndFooterOperationMode.CUSTOM) {
+            newHandler = new CustomHeaderAndFooterOperationModeHandler();
+        } else {
+            throw new UnsupportedOperationException("Unsupported Operation mode " + operationMode.getName());
+        }
+        headerAndFooterOperationModeHandler.onDeactivated();
+        newHandler.onActivated();
+        headerAndFooterOperationModeHandler = newHandler;
+        return Unchecked.cast(headerAndFooterOperationModeHandler.getRepresentation());
     }
 
     private abstract class OperationModeHandler<R> {
@@ -137,6 +152,113 @@ public class DefaultTabOverlayHandler implements TabOverlayHandler {
             packet.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
             packet.getPlayerInfoDataLists().write(0, list);
             ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+        }
+    }
+
+    private final class HeaderAndFooterPassthroughOperationModeHandler extends OperationModeHandler<Void> {
+
+        @Override
+        Void getRepresentation() {
+            return null;
+        }
+
+        @Override
+        boolean onPacketSending(ChannelHandlerContext ctx, PacketContainer packet) {
+            return true; // pass packets to client
+        }
+
+        @Override
+        @SneakyThrows
+        void onActivated() {
+            super.onActivated();
+            // todo we'd need to restore the vanilla header here.
+        }
+    }
+
+    private final class CustomHeaderAndFooterOperationModeHandler extends OperationModeHandler<HeaderAndFooterHandle> {
+        Representation representation = new Representation();
+
+        @Override
+        HeaderAndFooterHandle getRepresentation() {
+            return representation;
+        }
+
+        @Override
+        boolean onPacketSending(ChannelHandlerContext ctx, PacketContainer packet) {
+            // todo can't block those cause we'd block our own packets.
+            //return packet.getType() != PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER;
+            return true;
+        }
+
+        @Override
+        void onDeactivated() {
+            representation.valid = false;
+            super.onDeactivated();
+        }
+
+        class Representation implements HeaderAndFooterHandle {
+
+            boolean valid = true;
+            WrappedChatComponent header = CHAT_COMPONENT_EMPTY;
+            WrappedChatComponent footer = CHAT_COMPONENT_EMPTY;
+
+            @SneakyThrows
+            private void updateHeaderFooter() {
+                val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);
+                packet.getChatComponents().write(0, this.header);
+                packet.getChatComponents().write(1, this.footer);
+                ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+            }
+
+            @Override
+            public void setHeaderFooter(@Nullable String header, @Nullable String footer) {
+                this.header = header != null ? WrappedChatComponent.fromText(header) : CHAT_COMPONENT_EMPTY;
+                this.footer = footer != null ? WrappedChatComponent.fromText(footer) : CHAT_COMPONENT_EMPTY;
+                updateHeaderFooter();
+            }
+
+            @Override
+            public void setHeaderFooter(@Nullable String header, @Nullable String footer, char alternateColorChar) {
+                setHeaderFooter(header != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, header) : null,
+                        footer != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, footer) : null);
+            }
+
+            @Override
+            public void setHeader(@Nullable String header) {
+                this.header = header != null ? WrappedChatComponent.fromText(header) : CHAT_COMPONENT_EMPTY;
+                updateHeaderFooter();
+            }
+
+            @Override
+            public void setHeader(@Nullable String header, char alternateColorChar) {
+                setHeader(header != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, header) : null);
+            }
+
+            @Override
+            public void setFooter(@Nullable String footer) {
+                this.footer = footer != null ? WrappedChatComponent.fromText(footer) : CHAT_COMPONENT_EMPTY;
+                updateHeaderFooter();
+            }
+
+            @Override
+            public void setFooter(@Nullable String footer, char alternateColorChar) {
+                setFooter(footer != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, footer) : null);
+            }
+
+            @Override
+            public void beginBatchModification() {
+                // do nothing
+            }
+
+            @Override
+            public void completeBatchModification() {
+                // do nothing
+            }
+
+            @Override
+            public boolean isValid() {
+                return valid;
+            }
         }
     }
 
@@ -261,14 +383,12 @@ public class DefaultTabOverlayHandler implements TabOverlayHandler {
             }
         }
 
-        class Representation implements TabOverlay.BatchModifiable, TabOverlay.HeaderAndFooter {
+        class Representation implements TabOverlayHandle.BatchModifiable, TabOverlayHandle {
 
             boolean valid = true;
             Icon[] icons;
             String[] texts;
             int[] pings;
-            WrappedChatComponent header = CHAT_COMPONENT_EMPTY;
-            WrappedChatComponent footer = CHAT_COMPONENT_EMPTY;
 
             {
                 icons = new Icon[80];
@@ -333,49 +453,6 @@ public class DefaultTabOverlayHandler implements TabOverlayHandler {
                 ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
             }
 
-            @SneakyThrows
-            private void updateHeaderFooter() {
-                val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);
-                packet.getChatComponents().write(0, this.header);
-                packet.getChatComponents().write(1, this.footer);
-                ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-            }
-
-            @Override
-            public void setHeaderFooter(@Nullable String header, @Nullable String footer) {
-                this.header = header != null ? WrappedChatComponent.fromText(header) : CHAT_COMPONENT_EMPTY;
-                this.footer = footer != null ? WrappedChatComponent.fromText(footer) : CHAT_COMPONENT_EMPTY;
-                updateHeaderFooter();
-            }
-
-            @Override
-            public void setHeaderFooter(@Nullable String header, @Nullable String footer, char alternateColorChar) {
-                setHeaderFooter(header != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, header) : null,
-                        footer != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, footer) : null);
-            }
-
-            @Override
-            public void setHeader(@Nullable String header) {
-                this.header = header != null ? WrappedChatComponent.fromText(header) : CHAT_COMPONENT_EMPTY;
-                updateHeaderFooter();
-            }
-
-            @Override
-            public void setHeader(@Nullable String header, char alternateColorChar) {
-                setHeader(header != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, header) : null);
-            }
-
-            @Override
-            public void setFooter(@Nullable String footer) {
-                this.footer = footer != null ? WrappedChatComponent.fromText(footer) : CHAT_COMPONENT_EMPTY;
-                updateHeaderFooter();
-            }
-
-            @Override
-            public void setFooter(@Nullable String footer, char alternateColorChar) {
-                setFooter(footer != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, footer) : null);
-            }
-
             @Override
             public void beginBatchModification() {
                 // do nothing
@@ -400,7 +477,7 @@ public class DefaultTabOverlayHandler implements TabOverlayHandler {
             return new Representation();
         }
 
-        class Representation extends CustomOperationModeHandler.Representation implements RectangularTabOverlayWithHeaderAndFooter {
+        class Representation extends CustomOperationModeHandler.Representation implements RectangularTabOverlay {
 
             @Override
             public Dimension getSize() {
@@ -484,7 +561,7 @@ public class DefaultTabOverlayHandler implements TabOverlayHandler {
             return new Representation();
         }
 
-        class Representation extends CustomOperationModeHandler.Representation implements SimpleTabOverlayWithHeaderAndFooter {
+        class Representation extends CustomOperationModeHandler.Representation implements SimpleTabOverlay {
 
             @Override
             public void setSize(int size) {

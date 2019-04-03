@@ -9,7 +9,8 @@ import de.codecrafter47.taboverlay.bukkit.AdvancedTabOverlay;
 import de.codecrafter47.taboverlay.bukkit.TabOverlayHandlerFactory;
 import de.codecrafter47.taboverlay.bukkit.internal.util.UnorderedPair;
 import de.codecrafter47.taboverlay.bukkit.internal.util.Util;
-import de.codecrafter47.taboverlay.handler.OperationMode;
+import de.codecrafter47.taboverlay.handler.ContentOperationMode;
+import de.codecrafter47.taboverlay.handler.HeaderAndFooterOperationMode;
 import de.codecrafter47.taboverlay.handler.TabOverlayHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -114,7 +115,8 @@ public class DefaultTabOverlayHandlerFactory implements TabOverlayHandlerFactory
     @Override
     public void onDisable() {
         for (DefaultTabOverlayHandler handler : tabOverlayHandlerMap.values()) {
-            handler.enterOperationMode(OperationMode.PASS_TROUGH);
+            handler.enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
+            handler.enterHeaderAndFooterOperationMode(HeaderAndFooterOperationMode.PASS_TROUGH);
         }
     }
 
