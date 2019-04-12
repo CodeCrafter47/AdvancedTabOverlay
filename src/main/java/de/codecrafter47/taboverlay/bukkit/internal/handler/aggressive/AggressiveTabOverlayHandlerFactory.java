@@ -1,4 +1,4 @@
-package de.codecrafter47.taboverlay.bukkit.internal;
+package de.codecrafter47.taboverlay.bukkit.internal.handler.aggressive;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
@@ -27,13 +27,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class DefaultTabOverlayHandlerFactory implements TabOverlayHandlerFactory, Listener {
+public class AggressiveTabOverlayHandlerFactory implements TabOverlayHandlerFactory, Listener {
 
     private final Map<UnorderedPair<Player>, Double> lastDistance = new HashMap<>();
     private final AdvancedTabOverlay plugin;
-    private final Map<Player, DefaultTabOverlayHandler> tabOverlayHandlerMap = new HashMap<>();
+    private final Map<Player, AggressiveTabOverlayHandler> tabOverlayHandlerMap = new HashMap<>();
 
-    public DefaultTabOverlayHandlerFactory(AdvancedTabOverlay plugin) {
+    public AggressiveTabOverlayHandlerFactory(AdvancedTabOverlay plugin) {
         this.plugin = plugin;
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::removePlayers, 2, 2);
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::updatePlayerTracker, 5, 5);
@@ -98,7 +98,7 @@ public class DefaultTabOverlayHandlerFactory implements TabOverlayHandlerFactory
     @Override
     public TabOverlayHandler create(Player player) {
         val channel = Util.getChannel(player);
-        val tabOverlayHandler = new DefaultTabOverlayHandler(player);
+        val tabOverlayHandler = new AggressiveTabOverlayHandler(player);
         val channelHandler = new MyChannelHandler(tabOverlayHandler);
         channel.pipeline().addBefore("packet_handler", "AdvancedTabOverlay-0", channelHandler);
         tabOverlayHandlerMap.put(player, tabOverlayHandler);
@@ -114,7 +114,7 @@ public class DefaultTabOverlayHandlerFactory implements TabOverlayHandlerFactory
 
     @Override
     public void onDisable() {
-        for (DefaultTabOverlayHandler handler : tabOverlayHandlerMap.values()) {
+        for (AggressiveTabOverlayHandler handler : tabOverlayHandlerMap.values()) {
             handler.enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
             handler.enterHeaderAndFooterOperationMode(HeaderAndFooterOperationMode.PASS_TROUGH);
         }
@@ -122,7 +122,7 @@ public class DefaultTabOverlayHandlerFactory implements TabOverlayHandlerFactory
 
     @RequiredArgsConstructor
     private static class MyChannelHandler extends ChannelOutboundHandlerAdapter {
-        private final DefaultTabOverlayHandler tablistHandler;
+        private final AggressiveTabOverlayHandler tablistHandler;
 
         private static final Set<PacketType> interceptedPacketTypes = ImmutableSet.of(PacketType.Play.Server.PLAYER_INFO, PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER, PacketType.Play.Server.NAMED_ENTITY_SPAWN, PacketType.Play.Server.RESPAWN, PacketType.Play.Server.POSITION, PacketType.Play.Server.SPAWN_POSITION);
 

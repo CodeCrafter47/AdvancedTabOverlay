@@ -1,4 +1,4 @@
-package de.codecrafter47.taboverlay.bukkit.internal;
+package de.codecrafter47.taboverlay.bukkit.internal.handler.aggressive;
 
 import de.codecrafter47.taboverlay.AbstractTabOverlayProvider;
 import de.codecrafter47.taboverlay.TabView;
@@ -6,11 +6,11 @@ import de.codecrafter47.taboverlay.handler.ContentOperationMode;
 import de.codecrafter47.taboverlay.handler.HeaderAndFooterOperationMode;
 import de.codecrafter47.taboverlay.handler.TabOverlayHandle;
 
-public class PassthroughPriorFirstMoveHandler extends AbstractTabOverlayProvider<TabOverlayHandle, TabOverlayHandle> {
-    private final DefaultTabOverlayHandler handler;
+class PassthroughPriorFirstMoveHandler extends AbstractTabOverlayProvider<TabOverlayHandle, TabOverlayHandle> {
+    private final AggressiveTabOverlayHandler handler;
     private final TabView tabView;
 
-    protected PassthroughPriorFirstMoveHandler(DefaultTabOverlayHandler handler, TabView tabView) {
+    protected PassthroughPriorFirstMoveHandler(AggressiveTabOverlayHandler handler, TabView tabView) {
         super("passthrough-before-first-move", Integer.MAX_VALUE, ContentOperationMode.PASS_TROUGH, HeaderAndFooterOperationMode.PASS_TROUGH);
         this.handler = handler;
         this.tabView = tabView;

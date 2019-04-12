@@ -64,6 +64,7 @@ dependencies {
     compileOnly "me.clip.placeholderapi:PlaceholderAPI:1.8.5"
     compile "de.codecrafter47.taboverlay:TabOverlayCommon:0.4-SNAPSHOT"
     compile "de.codecrafter47.data:bukkit:1.0.2-SNAPSHOT"
+    compile "codecrafter47.util:chat-utils:1.1-SNAPSHOT"
 }
 
 task sourceJar(type: Jar) {

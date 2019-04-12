@@ -1,4 +1,4 @@
-package de.codecrafter47.taboverlay.bukkit.internal;
+package de.codecrafter47.taboverlay.bukkit.internal.handler.aggressive;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -20,7 +20,6 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ import java.util.stream.IntStream;
 
 // todo this currently breaks spectator mode players going trough walls
 @RequiredArgsConstructor
-public class DefaultTabOverlayHandler implements TabOverlayHandler {
+class AggressiveTabOverlayHandler implements TabOverlayHandler {
 
     private static final WrappedChatComponent CHAT_COMPONENT_EMPTY = WrappedChatComponent.fromJson("{\"text\":\"\"}");
     private final Player player;

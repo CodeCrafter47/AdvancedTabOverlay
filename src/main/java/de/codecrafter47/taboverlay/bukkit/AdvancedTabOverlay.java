@@ -4,16 +4,13 @@ import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.bukkit.internal.*;
+import de.codecrafter47.taboverlay.bukkit.internal.handler.safe.SafeTabOverlayHandlerFactory;
 import de.codecrafter47.taboverlay.bukkit.internal.util.Completer;
 import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
 import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import de.codecrafter47.taboverlay.config.platform.Platform;
-import io.netty.util.concurrent.DefaultEventExecutor;
-import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.EventExecutorGroup;
-import io.netty.util.concurrent.MultithreadEventExecutorGroup;
-import io.netty.util.concurrent.RejectedExecutionHandlers;
+import io.netty.util.concurrent.*;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.entity.Player;
@@ -66,18 +63,12 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         getCommand("ato").setExecutor(new ATOCommand());
         getCommand("ato").setTabCompleter(Completer.create().any("reload", "info"));
         Executor executor = (task) -> getServer().getScheduler().runTaskAsynchronously(this, task);
-        asyncExecutor = new MultithreadEventExecutorGroup(4, executor) {
-            @Override
-            protected EventExecutor newChild(Executor executor, Object... args) {
-                return new DefaultEventExecutor(this, executor, 512, RejectedExecutionHandlers.reject());
-            }
-        };
-        tabEventQueue = new DefaultEventExecutor(null,
-                executor,
-                128_000, RejectedExecutionHandlers.reject());
+        asyncExecutor = new DefaultEventExecutorGroup(4);
+        tabEventQueue = new DefaultEventExecutor();
         playerManager = new PlayerManager(this);
 
-        tabOverlayHandlerFactory = new DefaultTabOverlayHandlerFactory(this);
+        //tabOverlayHandlerFactory = new AggressiveTabOverlayHandlerFactory(this);
+        tabOverlayHandlerFactory = new SafeTabOverlayHandlerFactory();
 
         File dataFolder = getDataFolder();
         if (!dataFolder.exists()) {
