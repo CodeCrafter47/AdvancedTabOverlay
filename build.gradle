@@ -53,6 +53,10 @@ repositories {
     maven {
         url "http://repo.dmulloy2.net/nexus/repository/public/"
     }
+    maven {
+        name "CodeMC"
+        url "https://repo.codemc.org/repository/maven-public"
+    }
 }
 
 dependencies {
@@ -65,6 +69,7 @@ dependencies {
     compile "de.codecrafter47.taboverlay:TabOverlayCommon:0.4-SNAPSHOT"
     compile "de.codecrafter47.data:bukkit:1.0.2-SNAPSHOT"
     compile "codecrafter47.util:chat-utils:1.1-SNAPSHOT"
+    compile "org.bstats:bstats-bukkit:1.4"
 }
 
 task sourceJar(type: Jar) {
@@ -97,5 +102,7 @@ processResources {
 }
 
 shadowJar {
+    relocate 'codecrafter47.util', 'de.codecrafter47.taboverlay.libs.util'
+    relocate 'org.bstats', 'de.codecrafter47.taboverlay.libs.bstats'
     classifier = null
 }

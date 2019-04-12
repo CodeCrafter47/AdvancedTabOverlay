@@ -13,6 +13,7 @@ import de.codecrafter47.taboverlay.config.platform.Platform;
 import io.netty.util.concurrent.*;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -60,6 +61,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     @Override
     @SneakyThrows // todo catch exceptions
     public void onEnable() {
+        Metrics metrics = new Metrics(this);
         getCommand("ato").setExecutor(new ATOCommand());
         getCommand("ato").setTabCompleter(Completer.create().any("reload", "info"));
         Executor executor = (task) -> getServer().getScheduler().runTaskAsynchronously(this, task);
