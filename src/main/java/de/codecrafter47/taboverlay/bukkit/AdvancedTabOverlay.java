@@ -4,8 +4,12 @@ import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.bukkit.internal.*;
+import de.codecrafter47.taboverlay.bukkit.internal.config.PlayersByWorldComponentConfiguration;
 import de.codecrafter47.taboverlay.bukkit.internal.handler.safe.SafeTabOverlayHandlerFactory;
+import de.codecrafter47.taboverlay.bukkit.internal.placeholders.PAPIAwarePlayerPlaceholderResolver;
+import de.codecrafter47.taboverlay.bukkit.internal.placeholders.PlayerPlaceholderResolver;
 import de.codecrafter47.taboverlay.bukkit.internal.util.Completer;
+import de.codecrafter47.taboverlay.config.ComponentSpec;
 import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
 import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
@@ -115,6 +119,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                         .playerPingDataKey(ATODataKeys.PING)
                         .playerInvisibleDataKey(ATODataKeys.HIDDEN)
                         .playerCanSeeInvisibleDataKey(MinecraftData.permission("advancedtaboverlay.seehidden"))
+                        .component(new ComponentSpec("!players_by_world", PlayersByWorldComponentConfiguration.class))
                         .build(),
                 getLogger(),
                 tabEventQueue,

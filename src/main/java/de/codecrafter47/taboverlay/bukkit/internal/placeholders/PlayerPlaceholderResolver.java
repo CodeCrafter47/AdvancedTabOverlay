@@ -1,8 +1,9 @@
-package de.codecrafter47.taboverlay.bukkit.internal;
+package de.codecrafter47.taboverlay.bukkit.internal.placeholders;
 
 import de.codecrafter47.data.api.TypeToken;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
+import de.codecrafter47.taboverlay.bukkit.internal.ATODataKeys;
 import de.codecrafter47.taboverlay.config.placeholder.AbstractPlayerPlaceholderResolver;
 import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
 import de.codecrafter47.taboverlay.config.player.Player;

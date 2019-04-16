@@ -1,5 +1,6 @@
-package de.codecrafter47.taboverlay.bukkit.internal;
+package de.codecrafter47.taboverlay.bukkit.internal.placeholders;
 
+import de.codecrafter47.taboverlay.bukkit.internal.ATODataKeys;
 import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
 import de.codecrafter47.taboverlay.config.placeholder.UnknownPlaceholderException;
 import lombok.val;
