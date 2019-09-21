@@ -33,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -114,6 +115,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                 hasPlaceholderAPI
                         ? new PAPIAwarePlayerPlaceholderResolver()
                         : new PlayerPlaceholderResolver(),
+                Collections.emptySet(),
                 ConfigTabOverlayManager.Options.createBuilderWithDefaults()
                         .playerIconDataKey(ATODataKeys.ICON)
                         .playerPingDataKey(ATODataKeys.PING)
