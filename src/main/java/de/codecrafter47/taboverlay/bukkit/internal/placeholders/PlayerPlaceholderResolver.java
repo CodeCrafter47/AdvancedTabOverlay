@@ -1,12 +1,21 @@
 package de.codecrafter47.taboverlay.bukkit.internal.placeholders;
 
+import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.api.TypeToken;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.taboverlay.bukkit.internal.ATODataKeys;
-import de.codecrafter47.taboverlay.config.placeholder.AbstractPlayerPlaceholderResolver;
-import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
+import de.codecrafter47.taboverlay.config.context.Context;
+import de.codecrafter47.taboverlay.config.expression.ExpressionUpdateListener;
+import de.codecrafter47.taboverlay.config.expression.ToStringExpression;
+import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
+import de.codecrafter47.taboverlay.config.placeholder.*;
 import de.codecrafter47.taboverlay.config.player.Player;
+import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
+import lombok.SneakyThrows;
+
+import java.util.List;
+import java.util.function.Function;
 
 public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver {
     public PlayerPlaceholderResolver() {
@@ -16,7 +25,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("world", create(MinecraftData.World));
         addPlaceholder("team", create(MinecraftData.Team));
         addPlaceholder("vault_balance", create(MinecraftData.Economy_Balance));
-        addPlaceholder("vault_balance2", create(MinecraftData.Economy_Balance, null, b -> {
+        addPlaceholder("vault_balance2", create(MinecraftData.Economy_Balance, b -> {
             if (b >= 10_000_000) {
                 return String.format("%1.0fM", b / 1_000_000);
             } else if (b >= 10_000) {
@@ -26,7 +35,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
             } else {
                 return String.format("%1.2f", b);
             }
-        }));
+        }, TypeToken.STRING));
         addPlaceholder("multiverse_world_alias", create(BukkitData.Multiverse_WorldAlias));
         addPlaceholder("faction_name", create(BukkitData.Factions_FactionName));
         addPlaceholder("faction_member_count", create(BukkitData.Factions_FactionMembers));
@@ -58,12 +67,12 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("player_points", create(BukkitData.PlayerPoints_Points));
         addPlaceholder("vault_currency", create(MinecraftData.Economy_CurrencyNameSingular));
         addPlaceholder("vault_currency_plural", create(MinecraftData.Economy_CurrencyNamePlural));
-        addPlaceholder("tab_name", create(BukkitData.PlayerListName, Player::getName, null));
-        addPlaceholder("display_name", create(MinecraftData.DisplayName, Player::getName, null));
+        addPlaceholder("tab_name", create(BukkitData.PlayerListName, (player, name) -> name == null ? player.getName() : name, TypeToken.STRING));
+        addPlaceholder("display_name", create(MinecraftData.DisplayName, (player, name) -> name == null ? player.getName() : name, TypeToken.STRING));
         // todo addPlaceholder("session_duration_seconds", create(TypeToken.INTEGER, BungeeData.BungeeCord_SessionDuration, duration -> (int) (duration.getSeconds() % 60), null, null));
         // todo addPlaceholder("session_duration_minutes", create(TypeToken.INTEGER, BungeeData.BungeeCord_SessionDuration, duration -> (int) ((duration.getSeconds() % 3600) / 60), null, null));
         // todo addPlaceholder("session_duration_hours", create(TypeToken.INTEGER, BungeeData.BungeeCord_SessionDuration, duration -> (int) (duration.getSeconds() / 3600), null, null));
-        addPlaceholder("essentials_afk", create(BukkitData.Essentials_IsAFK, player -> false, null));
+        addPlaceholder("essentials_afk", create(BukkitData.Essentials_IsAFK, (player, afk) -> afk == null ? false : afk, TypeToken.BOOLEAN));
         addPlaceholder("is_hidden", create(ATODataKeys.HIDDEN));
         // todo addPlaceholder("gamemode", create(MinecraftData.DATA_KEY_GAMEMODE));
         addPlaceholder("askyblock_island_level", create(BukkitData.ASkyBlock_IslandLevel));
@@ -72,7 +81,58 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("permission", this::resolvePermissionPlaceholder);
     }
 
-    private PlayerPlaceholder<Boolean, Boolean> resolvePermissionPlaceholder(PlayerPlaceholder.BindPoint bindPoint, String[] tokens) {
-        return new PlayerPlaceholder<>(bindPoint, TypeToken.BOOLEAN, MinecraftData.permission(tokens[0]), null, null, getRepresentationFunction(TypeToken.BOOLEAN, tokens, null));
+    @SneakyThrows
+    private PlaceholderBuilder<?, ?> resolvePermissionPlaceholder(PlaceholderBuilder<Player, ?> builder, List<PlaceholderArg> args) {
+        if (args.isEmpty()) {
+            throw new PlaceholderException("Use of permission placeholder lacks specification of specific permission");
+        }
+        ExpressionTemplate permission = args.remove(0).getExpression();
+        Function<Context, Player> playerFunction = builder.getContextTransformation();
+        return PlaceholderBuilder.create().acquireData(() -> new PermissionDataProvider(permission.instantiateWithStringResult(), playerFunction), TypeToken.BOOLEAN, builder.isRequiresViewerContext() || permission.requiresViewerContext());
+    }
+
+    private static class PermissionDataProvider extends AbstractActiveElement<Runnable> implements PlaceholderDataProvider<Context, Boolean>, ExpressionUpdateListener {
+        private final ToStringExpression permission;
+        private final Function<Context, Player> playerFunction;
+        private DataKey<Boolean> permissionDataKey;
+
+        private PermissionDataProvider(ToStringExpression permission, Function<Context, Player> playerFunction) {
+            this.permission = permission;
+            this.playerFunction = playerFunction;
+        }
+
+        @Override
+        protected void onActivation() {
+            permission.activate(getContext(), this);
+            permissionDataKey = MinecraftData.permission(permission.evaluate());
+            if (hasListener()) {
+                playerFunction.apply(getContext()).addDataChangeListener(permissionDataKey, getListener());
+            }
+        }
+
+        @Override
+        protected void onDeactivation() {
+            permission.deactivate();
+            if (hasListener()) {
+                playerFunction.apply(getContext()).removeDataChangeListener(permissionDataKey, getListener());
+            }
+        }
+
+        @Override
+        public Boolean getData() {
+            return playerFunction.apply(getContext()).get(permissionDataKey);
+        }
+
+        @Override
+        public void onExpressionUpdate() {
+            if (hasListener()) {
+                playerFunction.apply(getContext()).removeDataChangeListener(permissionDataKey, getListener());
+            }
+            permissionDataKey = MinecraftData.permission(permission.evaluate());
+            if (hasListener()) {
+                playerFunction.apply(getContext()).addDataChangeListener(permissionDataKey, getListener());
+                getListener().run();
+            }
+        }
     }
 }

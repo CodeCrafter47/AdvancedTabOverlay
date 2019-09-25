@@ -1,213 +1,87 @@
 package de.codecrafter47.taboverlay.bukkit.internal.placeholders;
 
+import de.codecrafter47.data.api.TypeToken;
 import de.codecrafter47.taboverlay.bukkit.internal.ATOContextKeys;
-import de.codecrafter47.taboverlay.config.context.ContextKeys;
-import de.codecrafter47.taboverlay.config.expression.*;
-import de.codecrafter47.taboverlay.config.placeholder.Placeholder;
-import de.codecrafter47.taboverlay.config.placeholder.PlaceholderResolver;
-import de.codecrafter47.taboverlay.config.placeholder.UnknownPlaceholderException;
+import de.codecrafter47.taboverlay.config.context.Context;
+import de.codecrafter47.taboverlay.config.placeholder.*;
 import de.codecrafter47.taboverlay.config.player.Player;
 import de.codecrafter47.taboverlay.config.player.PlayerSet;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
-import de.codecrafter47.taboverlay.config.view.text.TextView;
-import de.codecrafter47.taboverlay.config.view.text.TextViewUpdateListener;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
-// todo allow format
-public class WorldPlaceholderResolver implements PlaceholderResolver {
+public class WorldPlaceholderResolver implements PlaceholderResolver<Context> {
+
+    @Nonnull
     @Override
-    public Placeholder resolve(String[] value, TemplateCreationContext tcc) throws UnknownPlaceholderException {
-        if (value.length >= 1 && "world".equalsIgnoreCase(value[0])) {
-            if (value.length == 2 && "name".equalsIgnoreCase(value[1])) {
-                return new WorldIdPlaceholder();
-            } else if (value.length == 2 && "player_count".equalsIgnoreCase(value[1])) {
-                return new WorldPlayerCountPlaceholder();
-            } else if (value.length == 1) {
-                return new WorldIdPlaceholder();
+    public PlaceholderBuilder<?, ?> resolve(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) throws UnknownPlaceholderException, PlaceholderException {
+        if (args.size() >= 1 && "world".equalsIgnoreCase(args.get(0).getText())) {
+            args.remove(0);
+            if (args.size() == 1 && "name".equalsIgnoreCase(args.get(0).getText())) {
+                args.remove(0);
+                return builder.acquireData(WorldIdPlaceholder::new, TypeToken.STRING);
+            } else if (args.size() == 1 && "player_count".equalsIgnoreCase(args.get(0).getText())) {
+                args.remove(0);
+                return builder.acquireData(WorldPlayerCountPlaceholder::new, TypeToken.INTEGER);
+            } else if (args.size() == 0) {
+                return builder.acquireData(WorldIdPlaceholder::new, TypeToken.STRING);
             }
+            throw new PlaceholderException("Unknown world placeholder");
         }
         throw new UnknownPlaceholderException();
     }
 
-    public static class WorldIdPlaceholder implements Placeholder {
+    public static class WorldIdPlaceholder extends AbstractActiveElement<Runnable> implements PlaceholderDataProvider<Context, String> {
 
         @Override
-        public ToStringExpression instantiateWithStringResult() {
-            return new ToStringInstance();
-        }
-
-        @Override
-        public ToDoubleExpression instantiateWithDoubleResult() {
-            return Conversions.toDouble(instantiateWithStringResult());
+        public String getData() {
+            return getContext().getCustomObject(ATOContextKeys.WORLD_ID);
         }
 
         @Override
-        public ToBooleanExpression instantiateWithBooleanResult() {
-            return Conversions.toBoolean(instantiateWithStringResult());
+        protected void onActivation() {
+
         }
 
         @Override
-        public boolean requiresViewerContext() {
-            return true; // todo too lazy to check, playing safe
-        }
+        protected void onDeactivation() {
 
-        @Override
-        @Nonnull
-        public TextView instantiate() {
-            return new TextViewInstance();
-        }
-
-        private static class AbstractInstance<T> extends AbstractActiveElement<T> {
-
-            @Override
-            protected void onActivation() {
-
-            }
-
-            @Override
-            protected void onDeactivation() {
-
-            }
-        }
-
-        private static class ToStringInstance extends AbstractInstance<ExpressionUpdateListener> implements ToStringExpression {
-
-            @Override
-            public String evaluate() {
-                return getContext().getCustomObject(ATOContextKeys.WORLD_ID);
-            }
-        }
-
-        private static class TextViewInstance extends AbstractInstance<TextViewUpdateListener> implements TextView {
-
-            @Override
-            public String getText() {
-                return getContext().getCustomObject(ATOContextKeys.WORLD_ID);
-            }
         }
     }
 
-    private static class WorldPlayerCountPlaceholder implements Placeholder {
+    private static class WorldPlayerCountPlaceholder extends AbstractActiveElement<Runnable> implements PlaceholderDataProvider<Context, Integer>, PlayerSet.Listener {
 
-        private WorldPlayerCountPlaceholder() {
+        private PlayerSet playerSet;
+
+        @Override
+        protected void onActivation() {
+            playerSet = getContext().getCustomObject(ATOContextKeys.WORLD_PLAYER_SET);
+            playerSet.addListener(this);
         }
 
         @Override
-        public ToStringExpression instantiateWithStringResult() {
-            return new ToStringInstance();
+        public Integer getData() {
+            return playerSet.getCount();
         }
 
         @Override
-        public ToDoubleExpression instantiateWithDoubleResult() {
-            return new ToDoubleInstance();
+        protected void onDeactivation() {
+            playerSet.removeListener(this);
         }
 
         @Override
-        public ToBooleanExpression instantiateWithBooleanResult() {
-            return Conversions.toBoolean(instantiateWithDoubleResult());
+        public void onPlayerAdded(Player player) {
+            if (hasListener()) {
+                getListener().run();
+            }
         }
 
         @Override
-        public boolean requiresViewerContext() {
-            return true; // todo too lazy to check, playing safe
-        }
-
-        @Override
-        public TextView instantiate() {
-            return new TextViewInstance();
-        }
-
-        private static abstract class AbstractInstance<T> extends AbstractActiveElement<T> implements PlayerSet.Listener {
-
-            private PlayerSet playerSet;
-
-            private AbstractInstance() {
-            }
-
-            @Override
-            protected void onActivation() {
-                playerSet = getContext().getCustomObject(ATOContextKeys.WORLD_PLAYER_SET);
-                playerSet.addListener(this);
-            }
-
-            @Override
-            protected void onDeactivation() {
-                playerSet.removeListener(this);
-            }
-
-            protected final int getPlayerCount() {
-                return playerSet.getCount();
-            }
-
-            @Override
-            public void onPlayerAdded(Player player) {
-                notifyListener();
-            }
-
-            @Override
-            public void onPlayerRemoved(Player player) {
-                notifyListener();
-            }
-
-            protected abstract void notifyListener();
-        }
-
-        private static class ToDoubleInstance extends AbstractInstance<ExpressionUpdateListener> implements ToDoubleExpression {
-
-            private ToDoubleInstance() {
-                super();
-            }
-
-            @Override
-            protected void notifyListener() {
-                if (hasListener()) {
-                    getListener().onExpressionUpdate();
-                }
-            }
-
-            @Override
-            public double evaluate() {
-                return getPlayerCount();
-            }
-        }
-
-        private static class ToStringInstance extends AbstractInstance<ExpressionUpdateListener> implements ToStringExpression {
-
-            private ToStringInstance() {
-                super();
-            }
-
-            @Override
-            protected void notifyListener() {
-                if (hasListener()) {
-                    getListener().onExpressionUpdate();
-                }
-            }
-
-            @Override
-            public String evaluate() {
-                return Integer.toString(getPlayerCount());
-            }
-        }
-
-        private static class TextViewInstance extends AbstractInstance<TextViewUpdateListener> implements TextView {
-
-            private TextViewInstance() {
-                super();
-            }
-
-            @Override
-            protected void notifyListener() {
-                if (hasListener()) {
-                    getListener().onTextUpdated();
-                }
-            }
-
-            @Override
-            public String getText() {
-                return Integer.toString(getPlayerCount());
+        public void onPlayerRemoved(Player player) {
+            if (hasListener()) {
+                getListener().run();
             }
         }
     }

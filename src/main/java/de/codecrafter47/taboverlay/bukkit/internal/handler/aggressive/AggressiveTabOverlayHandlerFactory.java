@@ -51,6 +51,7 @@ public class AggressiveTabOverlayHandlerFactory implements TabOverlayHandlerFact
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void updatePlayerTracker() {
         // remove players not connected
         lastDistance.keySet().removeIf(it -> !it.a.isOnline() || !it.b.isOnline());

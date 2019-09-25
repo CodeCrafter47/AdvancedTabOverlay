@@ -10,7 +10,7 @@ import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
 import de.codecrafter47.taboverlay.config.placeholder.OtherCountPlaceholderResolver;
-import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
+import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderResolver;
 import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
@@ -74,8 +74,8 @@ public class PlayersByWorldComponentConfiguration extends MarkedPropertyBase imp
         childContextS.addPlaceholderResolver(new WorldPlaceholderResolver());
 
         TemplateCreationContext childContextP = childContextS.clone();
-        childContextP.setDefaultIcon(new PlayerIconTemplate(PlayerPlaceholder.BindPoint.PLAYER, tcc.getPlayerIconDataKey()));
-        childContextP.setDefaultPing(new PlayerPingTemplate(PlayerPlaceholder.BindPoint.PLAYER, tcc.getPlayerPingDataKey()));
+        childContextP.setDefaultIcon(new PlayerIconTemplate(PlayerPlaceholderResolver.BindPoint.PLAYER, tcc.getPlayerIconDataKey()));
+        childContextP.setDefaultPing(new PlayerPingTemplate(PlayerPlaceholderResolver.BindPoint.PLAYER, tcc.getPlayerPingDataKey()));
         childContextP.setPlayerAvailable(true);
 
         TemplateCreationContext childContextM = tcc.clone();
