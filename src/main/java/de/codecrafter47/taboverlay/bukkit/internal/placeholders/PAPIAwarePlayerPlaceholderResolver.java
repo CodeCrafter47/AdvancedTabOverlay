@@ -32,9 +32,9 @@ public class PAPIAwarePlayerPlaceholderResolver extends PlayerPlaceholderResolve
                 for (String prefix : prefixes) {
                     if (token.substring(0, prefix.length()).equalsIgnoreCase(prefix)) {
                         args.remove(0);
-                        val constructor = create(ATODataKeys.createPlaceholderAPIDataKey("%" + token + "%"));
-                        addPlaceholder(token, constructor);
-                        return constructor.apply(builder, args);
+                        val resolver = create(ATODataKeys.createPlaceholderAPIDataKey("%" + token + "%"));
+                        addPlaceholder(token, resolver);
+                        return resolver.resolve(builder, args, tcc);
                     }
                 }
             }

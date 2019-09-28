@@ -11,9 +11,11 @@ import de.codecrafter47.taboverlay.config.expression.ToStringExpression;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
 import de.codecrafter47.taboverlay.config.placeholder.*;
 import de.codecrafter47.taboverlay.config.player.Player;
+import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
 import lombok.SneakyThrows;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Function;
 
@@ -82,7 +84,8 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
     }
 
     @SneakyThrows
-    private PlaceholderBuilder<?, ?> resolvePermissionPlaceholder(PlaceholderBuilder<Player, ?> builder, List<PlaceholderArg> args) {
+    @Nonnull
+    private PlaceholderBuilder<?, ?> resolvePermissionPlaceholder(PlaceholderBuilder<Player, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
         if (args.isEmpty()) {
             throw new PlaceholderException("Use of permission placeholder lacks specification of specific permission");
         }
