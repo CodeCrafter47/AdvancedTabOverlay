@@ -87,7 +87,9 @@ final class VanillaTabOverlayTracker {
                 case REMOVE_PLAYER:
                     for (PlayerInfoData infoData : data) {
                         PlayerListEntry entry = playerListEntries.remove(infoData.getProfile().getUUID());
-                        fireOnPlayerRemoved(ctx, entry);
+                        if (entry != null) {
+                            fireOnPlayerRemoved(ctx, entry);
+                        }
                     }
                     break;
             }
@@ -229,7 +231,7 @@ final class VanillaTabOverlayTracker {
         void onGameModeUpdate(ChannelHandlerContext ctx, PlayerListEntry entry);
     }
 
-    class PlayerListEntry {
+    static class PlayerListEntry {
 
         PlayerListEntry(PlayerInfoData data) {
             latency = data.getLatency();
