@@ -14,7 +14,10 @@ import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
 import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import de.codecrafter47.taboverlay.config.platform.Platform;
-import io.netty.util.concurrent.*;
+import io.netty.util.concurrent.DefaultEventExecutor;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.netty.util.concurrent.EventExecutor;
+import io.netty.util.concurrent.EventExecutorGroup;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bstats.bukkit.Metrics;
@@ -34,8 +37,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
@@ -43,7 +44,7 @@ import java.util.zip.ZipInputStream;
 
 public class AdvancedTabOverlay extends JavaPlugin implements Listener {
 
-    private final Map<Player, TabView> playerTabViewMap = new IdentityHashMap<>();
+    private PlayerTabViewManager tabViewManager;
     private TabOverlayHandlerFactory tabOverlayHandlerFactory;
     private ConfigTabOverlayManager configTabOverlayManager;
     private EventListener listener;
@@ -73,6 +74,8 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         asyncExecutor = new DefaultEventExecutorGroup(4);
         tabEventQueue = new DefaultEventExecutor();
         playerManager = new PlayerManager(this);
+
+        tabViewManager = new PlayerTabViewManager(this, getLogger(), asyncExecutor);
 
         //tabOverlayHandlerFactory = new AggressiveTabOverlayHandlerFactory(this);
         tabOverlayHandlerFactory = new SafeTabOverlayHandlerFactory();
@@ -155,8 +158,8 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
 
     private void addPlayer(Player bukkitPlayer) {
         de.codecrafter47.taboverlay.config.player.Player player = playerManager.onPlayerJoin(bukkitPlayer);
-        TabView tabView = new TabView(tabOverlayHandlerFactory.create(bukkitPlayer), getLogger(), asyncExecutor);
-        playerTabViewMap.put(bukkitPlayer, tabView);
+        TabView tabView = tabViewManager.get(bukkitPlayer);
+        tabView.getTabOverlayProviders().activate(tabOverlayHandlerFactory.create(bukkitPlayer));
         tabOverlayHandlerFactory.onCreated(tabView, bukkitPlayer);
         if (listener != null) {
             listener.onTabViewAdded(tabView, player);
@@ -165,11 +168,14 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDisconnect(PlayerQuitEvent event) {
-        playerManager.onPlayerDisconnect(event.getPlayer());
-        TabView tabView = playerTabViewMap.remove(event.getPlayer());
-        if (listener != null && tabView != null) {
+        Player player = event.getPlayer();
+        playerManager.onPlayerDisconnect(player);
+        TabView tabView = tabViewManager.get(player);
+        tabViewManager.removeFromPlayer(player);
+        if (listener != null) {
             listener.onTabViewRemoved(tabView);
         }
+        tabView.deactivate();
     }
 
     @EventHandler
@@ -183,7 +189,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     }
 
     public TabView getTabView(Player player) {
-        return playerTabViewMap.get(player);
+        return tabViewManager.get(player);
     }
 
     public void reload() {
