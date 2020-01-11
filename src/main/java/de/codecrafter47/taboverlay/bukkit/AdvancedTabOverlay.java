@@ -113,19 +113,21 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         iconManager = new DefaultIconManager(asyncExecutor, tabEventQueue, getDataFolder().toPath().resolve("icons"), getLogger());
         boolean hasPlaceholderAPI = getServer().getPluginManager().getPlugin("PlaceholderAPI") != null;
 
+        ConfigTabOverlayManager.Options options = ConfigTabOverlayManager.Options.createBuilderWithDefaults()
+                .playerIconDataKey(ATODataKeys.ICON)
+                .playerPingDataKey(ATODataKeys.PING)
+                .playerInvisibleDataKey(ATODataKeys.HIDDEN)
+                .playerCanSeeInvisibleDataKey(MinecraftData.permission("advancedtaboverlay.seehidden"))
+                .component(new ComponentSpec("!players_by_world", PlayersByWorldComponentConfiguration.class))
+                .build();
         configTabOverlayManager = new ConfigTabOverlayManager(new MyPlatform(),
                 playerManager,
                 hasPlaceholderAPI
                         ? new PAPIAwarePlayerPlaceholderResolver()
                         : new PlayerPlaceholderResolver(),
                 Collections.emptySet(),
-                ConfigTabOverlayManager.Options.createBuilderWithDefaults()
-                        .playerIconDataKey(ATODataKeys.ICON)
-                        .playerPingDataKey(ATODataKeys.PING)
-                        .playerInvisibleDataKey(ATODataKeys.HIDDEN)
-                        .playerCanSeeInvisibleDataKey(MinecraftData.permission("advancedtaboverlay.seehidden"))
-                        .component(new ComponentSpec("!players_by_world", PlayersByWorldComponentConfiguration.class))
-                        .build(),
+                ConfigTabOverlayManager.constructYamlInstance(options),
+                options,
                 getLogger(),
                 tabEventQueue,
                 iconManager);
