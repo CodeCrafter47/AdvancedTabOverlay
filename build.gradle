@@ -51,7 +51,7 @@ repositories {
         url "http://nexus.codecrafter47.dyndns.eu/content/repositories/public/"
     }
     maven {
-        url "http://repo.dmulloy2.net/nexus/repository/public/"
+        url "https://repo.dmulloy2.net/nexus/repository/public/"
     }
     maven {
         name "CodeMC"
@@ -64,7 +64,7 @@ dependencies {
     compileOnly "com.google.code.findbugs:jsr305:3.0.1"
     compileOnly "org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT"
     compileOnly "io.netty:netty-all:4.1.9.Final"
-    compileOnly "com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT"
+    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
     compileOnly "me.clip.placeholderapi:PlaceholderAPI:1.8.5"
     compile "de.codecrafter47.taboverlay:TabOverlayCommon:0.4-SNAPSHOT"
     compile "de.codecrafter47.data:bukkit:1.0.2-SNAPSHOT"
