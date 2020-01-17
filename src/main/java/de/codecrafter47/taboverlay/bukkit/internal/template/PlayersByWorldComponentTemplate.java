@@ -13,7 +13,6 @@ import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import de.codecrafter47.taboverlay.config.view.components.ComponentView;
 import de.codecrafter47.taboverlay.config.view.components.ContainerComponentView;
 import de.codecrafter47.taboverlay.config.view.components.PartitionedPlayersView;
-import de.codecrafter47.taboverlay.config.view.components.PlayersComponentView;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
@@ -65,6 +64,7 @@ public class PlayersByWorldComponentTemplate implements ComponentTemplate {
         return LayoutInfo.builder()
                 .constantSize(false)
                 .minSize(0)
+                .blockAligned(true)
                 .build();
     }
 

@@ -4,7 +4,7 @@ import de.codecrafter47.taboverlay.bukkit.internal.placeholders.WorldPlaceholder
 import de.codecrafter47.taboverlay.bukkit.internal.template.PlayersByWorldComponentTemplate;
 import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.PlayerOrderConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
+import de.codecrafter47.taboverlay.config.dsl.components.BasicComponentConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
@@ -27,7 +27,7 @@ public class PlayersByWorldComponentConfiguration extends MarkedPropertyBase imp
 
     private PlayerOrderConfiguration playerOrder = PlayerOrderConfiguration.DEFAULT;
     private MarkedStringProperty playerSet;
-    private ComponentConfiguration playerComponent; // todo add defaults
+    private ComponentConfiguration playerComponent = new BasicComponentConfiguration("${player name}");
     @Nullable
     private ComponentConfiguration morePlayersComponent;
     private boolean fillSlotsVertical = false;
@@ -43,15 +43,15 @@ public class PlayersByWorldComponentConfiguration extends MarkedPropertyBase imp
     private ComponentConfiguration worldSeparator;
 
     @Override
-    public ComponentTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public ComponentTemplate toTemplate(TemplateCreationContext tcc) {
         if (ConfigValidationUtil.checkNotNull(tcc, "!players_by_world component", "playerSet", playerSet, getStartMark())) {
             if (!tcc.getPlayerSets().containsKey(playerSet.getValue())) {
                 tcc.getErrorHandler().addError("No player set definition available for player set \"" + playerSet.getValue() + "\"", playerSet.getStartMark());
             }
         }
 
-        PlayerOrderTemplate playerOrderTemplate = null; // todo better dummy value
-        if(ConfigValidationUtil.checkNotNull(tcc, "!players_by_world component", "playerOrder", playerOrder, getStartMark())) {
+        PlayerOrderTemplate playerOrderTemplate = PlayerOrderConfiguration.DEFAULT.toTemplate(tcc);
+        if (ConfigValidationUtil.checkNotNull(tcc, "!players_by_world component", "playerOrder", playerOrder, getStartMark())) {
             playerOrderTemplate = this.playerOrder.toTemplate(tcc);
 
         }
