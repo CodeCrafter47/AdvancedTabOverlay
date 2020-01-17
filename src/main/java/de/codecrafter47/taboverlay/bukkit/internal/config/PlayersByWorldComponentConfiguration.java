@@ -81,18 +81,38 @@ public class PlayersByWorldComponentConfiguration extends MarkedPropertyBase imp
         TemplateCreationContext childContextM = tcc.clone();
         childContextM.addPlaceholderResolver(new OtherCountPlaceholderResolver());
 
-        // todo check playerComponent for fixed size and not block aligned
         ComponentTemplate playerComponentTemplate = tcc.emptyComponent(); // dummy
         if (ConfigValidationUtil.checkNotNull(tcc, "!players_by_world component", "playerComponent", playerComponent, getStartMark())) {
             playerComponentTemplate = this.playerComponent.toTemplate(childContextP);
+            ComponentTemplate.LayoutInfo layoutInfo = playerComponentTemplate.getLayoutInfo();
+            if (!layoutInfo.isConstantSize()) {
+                tcc.getErrorHandler().addError("Failed to configure !players_by_world component. Attribute playerComponent must not have variable size.", playerComponent.getStartMark());
+            }
+            if (layoutInfo.isBlockAligned()) {
+                tcc.getErrorHandler().addError("Failed to configure !players_by_world component. Attribute playerComponent must not require block alignment.", playerComponent.getStartMark());
+            }
         }
 
-        // todo check more players component for fixed size and not block aligned
+        ComponentTemplate morePlayersComponentTemplate;
+        if (this.morePlayersComponent != null) {
+
+            morePlayersComponentTemplate = this.morePlayersComponent.toTemplate(childContextM);
+            ComponentTemplate.LayoutInfo layoutInfo = morePlayersComponentTemplate.getLayoutInfo();
+            if (!layoutInfo.isConstantSize()) {
+                tcc.getErrorHandler().addError("Failed to configure !players_by_world component. Attribute playerComponent cannot have variable size.", morePlayersComponent.getStartMark());
+            }
+            if (layoutInfo.isBlockAligned()) {
+                tcc.getErrorHandler().addError("Failed to configure !players_by_world component. Attribute playerComponent must not require block alignment.", morePlayersComponent.getStartMark());
+            }
+        } else {
+            morePlayersComponentTemplate = childContextM.emptyComponent();
+        }
+
         return PlayersByWorldComponentTemplate.builder()
                 .playerOrder(playerOrderTemplate)
                 .playerSet(tcc.getPlayerSets().get(playerSet.getValue()))
                 .playerComponent(playerComponentTemplate)
-                .morePlayersComponent(morePlayersComponent != null ? morePlayersComponent.toTemplate(childContextM) : childContextM.emptyComponent())
+                .morePlayersComponent(morePlayersComponentTemplate)
                 .worldHeader(worldHeader != null ? worldHeader.toTemplate(childContextS) : null)
                 .worldFooter(worldFooter != null ? worldFooter.toTemplate(childContextS) : null)
                 .worldSeparator(worldSeparator != null ? worldSeparator.toTemplate(tcc) : null)
