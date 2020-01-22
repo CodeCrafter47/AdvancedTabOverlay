@@ -183,11 +183,13 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     @EventHandler
     public void onPluginEnable(PluginEnableEvent event) {
         dataManager.updateHooks();
+        softReload();
     }
 
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
         dataManager.updateHooks();
+        softReload();
     }
 
     public TabView getTabView(Player player) {
@@ -197,6 +199,10 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     public void reload() {
         Path tabLists = getDataFolder().toPath().resolve("tabLists");
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
+    }
+
+    private void softReload() {
+        configTabOverlayManager.refreshConfigs();
     }
 
     private final class MyPlatform implements Platform {
