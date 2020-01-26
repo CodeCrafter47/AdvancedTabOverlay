@@ -38,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -57,6 +58,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     private DataManager dataManager;
     @Getter
     private DefaultIconManager iconManager;
+    private Future<Void> softReloadTask;
 
     @Override
     public void onLoad() {
@@ -132,9 +134,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                 tabEventQueue,
                 iconManager);
 
-        Path tabLists = getDataFolder().toPath().resolve("tabLists");
-        Files.createDirectories(tabLists);
-        configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
+        getServer().getScheduler().scheduleSyncDelayedTask(this, this::onServerFullyLoaded);
         getServer().getPluginManager().registerEvents(this, this);
         dataManager.enable();
 
@@ -142,6 +142,13 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
             addPlayer(player);
         }
 
+    }
+
+    @SneakyThrows
+    private void onServerFullyLoaded() {
+        Path tabLists = getDataFolder().toPath().resolve("tabLists");
+        Files.createDirectories(tabLists);
+        configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
     }
 
     @Override
@@ -182,14 +189,12 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPluginEnable(PluginEnableEvent event) {
-        dataManager.updateHooks();
-        softReload();
+        scheduleSoftReload();
     }
 
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
-        dataManager.updateHooks();
-        softReload();
+        scheduleSoftReload();
     }
 
     public TabView getTabView(Player player) {
@@ -201,7 +206,18 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
     }
 
+    private void scheduleSoftReload() {
+        if (softReloadTask == null) {
+            softReloadTask = getServer().getScheduler().callSyncMethod(this, () -> {
+                softReload();
+                return null;
+            });
+        }
+    }
+
     private void softReload() {
+        softReloadTask = null;
+        dataManager.updateHooks();
         configTabOverlayManager.refreshConfigs();
     }
 
