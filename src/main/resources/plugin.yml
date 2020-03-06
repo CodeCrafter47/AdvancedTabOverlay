@@ -5,7 +5,19 @@ author: CodeCrafter47
 description: |
   Allows to customize the tab overlay.
 depend: ["ProtocolLib"]
-softdepend: ["PlaceholderAPI"]
+softdepend:
+  - Factions
+  - Vault
+  - VanishNoPacket
+  - SuperVanish
+  - PremiumVanish
+  - PlayerPoints
+  - PlaceholderAPI
+  - SimpleClans
+  - Essentials
+  - Multiverse-Core
+  - ASkyBlock
+  - CMI
 commands:
   ato:
     aliases: ["advancedtaboverlay"]
