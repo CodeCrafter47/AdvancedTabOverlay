@@ -69,8 +69,6 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            tablistHandler.networkTick(ctx);
-
             val packet = PacketContainer.fromPacket(msg);
             if (interceptedPacketTypes.contains(packet.getType())) {
                 PacketContainer clonedPacket = packet.shallowClone();
@@ -81,6 +79,8 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
             } else {
                 super.write(ctx, msg, promise);
             }
+            
+            tablistHandler.networkTick(ctx);
         }
 
         @Override
