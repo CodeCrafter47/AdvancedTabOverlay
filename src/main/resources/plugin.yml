@@ -18,6 +18,8 @@ softdepend:
   - Multiverse-Core
   - ASkyBlock
   - CMI
+loadbefore:
+  - TAB
 commands:
   ato:
     aliases: ["advancedtaboverlay"]
