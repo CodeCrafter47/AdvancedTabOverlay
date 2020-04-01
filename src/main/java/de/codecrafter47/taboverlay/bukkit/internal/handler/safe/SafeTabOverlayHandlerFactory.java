@@ -65,7 +65,7 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
     private static class MyChannelHandler extends ChannelOutboundHandlerAdapter {
         private final SafeTabOverlayHandler tablistHandler;
 
-        private static final Set<PacketType> interceptedPacketTypes = ImmutableSet.of(PacketType.Play.Server.PLAYER_INFO, PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER, PacketType.Play.Server.NAMED_ENTITY_SPAWN, PacketType.Play.Server.RESPAWN, PacketType.Play.Server.POSITION, PacketType.Play.Server.SPAWN_POSITION);
+        private static final Set<PacketType> interceptedPacketTypes = ImmutableSet.of(PacketType.Play.Server.PLAYER_INFO, PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER, PacketType.Play.Server.SCOREBOARD_TEAM);
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
@@ -74,8 +74,8 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
                 PacketContainer clonedPacket = packet.shallowClone();
                 if (tablistHandler.onPacketSending(ctx, packet)) {
                     super.write(ctx, packet.getHandle(), promise);
-                    tablistHandler.onPacketSent(ctx, clonedPacket);
                 }
+                tablistHandler.onPacketSent(ctx, clonedPacket);
             } else {
                 super.write(ctx, msg, promise);
             }

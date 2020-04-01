@@ -1,13 +1,20 @@
 package de.codecrafter47.taboverlay.bukkit.internal;
 
+import com.google.common.base.Joiner;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.bukkit.AdvancedTabOverlay;
+import de.codecrafter47.taboverlay.bukkit.internal.util.Util;
+import io.netty.channel.ChannelHandler;
+import lombok.val;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class ATOCommand implements CommandExecutor {
@@ -34,6 +41,15 @@ public class ATOCommand implements CommandExecutor {
             sender.sendMessage("You're using AdvancedTabOverlay v" + plugin.getDescription().getVersion());
             sender.sendMessage("Use /ato reload to reload the configuration");
             return true;
+        } else if (args.length == 1 && args[0].equalsIgnoreCase("pipeline")) {
+            Player player = (Player) sender;
+            val channel = Util.getChannel(player);
+            List<String> pipeline = new ArrayList<>();
+            for (Map.Entry<String, ChannelHandler> entry : channel.pipeline()) {
+                pipeline.add(entry.getKey());
+            }
+
+            player.sendMessage("Pipeline: " + Joiner.on(", ").join(pipeline));
         }
 
         return false;

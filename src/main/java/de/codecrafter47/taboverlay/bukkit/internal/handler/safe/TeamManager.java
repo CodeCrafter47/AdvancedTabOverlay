@@ -160,6 +160,8 @@ class TeamManager implements VanillaTabOverlayTracker.TeamEventListener {
         if (slot != null) {
             val packet = packetHelper.updateTeamWithDefaults(Constants.SLOT_TEAM_NAME[slot]);
             ctx.write(packet.getHandle(), ctx.newPromise());
+        } else {
+            addToOverflowTeam(ctx, player);
         }
     }
 
@@ -172,6 +174,9 @@ class TeamManager implements VanillaTabOverlayTracker.TeamEventListener {
                 val packet = packetHelper.updateTeam(Constants.SLOT_TEAM_NAME[slot], properties);
                 ctx.write(packet.getHandle(), ctx.newPromise());
             }
+        } else {
+            val packet = packetHelper.addPlayerToTeam(team, player);
+            ctx.write(packet.getHandle(), ctx.newPromise());
         }
     }
 
