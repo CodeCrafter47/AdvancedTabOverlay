@@ -4,7 +4,8 @@
 
 # AdvancedTabOverlay
 AdvancedTabOverlay is a tab list plugin for Spigot, which provides highly customisable features including but not limited to:
-- Fake Players (Custom slots)
+- Custom slots with icon, text and ping
+  - Those can even be animated!
 - Displaying of different tab lists depending on various conditions
   - Per Player
   - Per World
