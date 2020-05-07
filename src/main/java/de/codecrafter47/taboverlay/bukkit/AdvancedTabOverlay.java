@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.bukkit.internal.*;
+import de.codecrafter47.taboverlay.bukkit.internal.config.MainConfig;
 import de.codecrafter47.taboverlay.bukkit.internal.config.PlayersByWorldComponentConfiguration;
 import de.codecrafter47.taboverlay.bukkit.internal.handler.safe.SafeTabOverlayHandlerFactory;
 import de.codecrafter47.taboverlay.bukkit.internal.placeholders.PAPIAwarePlayerPlaceholderResolver;
@@ -11,6 +12,8 @@ import de.codecrafter47.taboverlay.bukkit.internal.placeholders.PlayerPlaceholde
 import de.codecrafter47.taboverlay.bukkit.internal.util.Completer;
 import de.codecrafter47.taboverlay.config.ComponentSpec;
 import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
+import de.codecrafter47.taboverlay.config.ErrorHandler;
+import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
 import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import de.codecrafter47.taboverlay.config.platform.Platform;
@@ -20,6 +23,7 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.EventExecutorGroup;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,13 +34,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -59,6 +64,8 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     @Getter
     private DefaultIconManager iconManager;
     private Future<Void> softReloadTask;
+    private MainConfig config;
+    private Yaml yaml;
 
     @Override
     public void onLoad() {
@@ -122,13 +129,15 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                 .playerCanSeeInvisibleDataKey(MinecraftData.permission("advancedtaboverlay.seehidden"))
                 .component(new ComponentSpec("!players_by_world", PlayersByWorldComponentConfiguration.class))
                 .build();
+        yaml = ConfigTabOverlayManager.constructYamlInstance(options);
+
         configTabOverlayManager = new ConfigTabOverlayManager(new MyPlatform(),
                 playerManager,
                 hasPlaceholderAPI
                         ? new PAPIAwarePlayerPlaceholderResolver()
                         : new PlayerPlaceholderResolver(),
                 Collections.emptySet(),
-                ConfigTabOverlayManager.constructYamlInstance(options),
+                yaml,
                 options,
                 getLogger(),
                 tabEventQueue,
@@ -141,14 +150,40 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         for (Player player : getServer().getOnlinePlayers()) {
             addPlayer(player);
         }
+    }
 
+    private void loadMainConfig() {
+        try {
+            File configFile = new File(getDataFolder(), "config.yml");
+            if (!configFile.exists()) {
+                config = new MainConfig();
+                config.needWrite = true;
+            } else {
+                ErrorHandler.set(new ErrorHandler());
+                config = yaml.loadAs(new FileInputStream(configFile), MainConfig.class);
+                ErrorHandler errorHandler = ErrorHandler.get();
+                ErrorHandler.set(null);
+                if (!errorHandler.getEntries().isEmpty()) {
+                    getLogger().log(Level.WARNING, errorHandler.formatErrors(configFile.getName()));
+                }
+            }
+            if (config.needWrite) {
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8));
+                config.write(writer, yaml);
+            }
+        } catch (IOException ex) {
+            getLogger().log(Level.SEVERE, "Failed to load config.yml: " + ex.getMessage(), ex);
+            if (config == null) {
+                config = new MainConfig();
+            }
+        }
     }
 
     @SneakyThrows
     private void onServerFullyLoaded() {
         Path tabLists = getDataFolder().toPath().resolve("tabLists");
         Files.createDirectories(tabLists);
-        configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
+        reload();
     }
 
     @Override
@@ -202,6 +237,18 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     }
 
     public void reload() {
+        loadMainConfig();
+
+        if (config.customPlaceholders != null) {
+            val customPlaceholders = new HashMap<String, CustomPlaceholderConfiguration>();
+            for (val entry : config.customPlaceholders.entrySet()) {
+                if (entry.getKey() != null && entry.getValue() != null) {
+                    customPlaceholders.put(entry.getKey(), entry.getValue());
+                }
+            }
+            configTabOverlayManager.setGlobalCustomPlaceholders(customPlaceholders);
+        }
+
         Path tabLists = getDataFolder().toPath().resolve("tabLists");
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
     }

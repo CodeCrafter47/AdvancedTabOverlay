@@ -1,0 +1,5 @@
+# This is the configuration file of AdvancedTabOverlay
+# Have a look at the wiki: https://github.com/CodeCrafter47/AdvancedTabOverlay/wiki
+# The tab list is configured using the files in the tabLists directory.
+
+customPlaceholders: {}
