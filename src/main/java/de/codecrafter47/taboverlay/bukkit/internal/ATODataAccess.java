@@ -27,6 +27,7 @@ public class ATODataAccess extends AbstractBukkitDataAccess<Player> {
         super(logger, plugin);
 
         addProvider(ATODataKeys.PING, ATODataAccess::getPlayerPing);
+        addProvider(ATODataKeys.GAMEMODE, ATODataAccess::getPlayerGamemode);
         addProvider(ATODataKeys.ICON, ATODataAccess::getPlayerIcon);
         addProvider(ATODataKeys.HIDDEN, this::isPlayerInvisible);
         playerDataAccess = new PlayerDataAccess(plugin);
@@ -54,6 +55,10 @@ public class ATODataAccess extends AbstractBukkitDataAccess<Player> {
         }
         Object nmsPlayer = BukkitUnwrapper.getInstance().unwrapItem(player);
         return (Integer) PING.get(nmsPlayer);
+    }
+
+    private static Integer getPlayerGamemode(Player player) {
+        return player.getGameMode().getValue();
     }
 
     private Boolean isPlayerInvisible(Player player) {

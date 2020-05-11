@@ -36,6 +36,8 @@ public class MainConfig implements UpdateableConfig {
 
     public Map<String, CustomPlaceholderConfiguration> customPlaceholders = new HashMap<>();
 
+    public boolean disableCustomTabListForSpectators = true;
+
     public transient boolean needWrite = false;
 
     @Override
@@ -48,7 +50,8 @@ public class MainConfig implements UpdateableConfig {
         }
 
         val newConfigOptions = ImmutableList.<String>of(
-                "customPlaceholders"
+                "customPlaceholders",
+                "disableCustomTabListForSpectators"
         );
 
         for (String option : newConfigOptions) {

@@ -17,6 +17,7 @@ import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
 import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import de.codecrafter47.taboverlay.config.platform.Platform;
+import de.codecrafter47.taboverlay.spectator.SpectatorPassthroughTabOverlayManager;
 import io.netty.util.concurrent.DefaultEventExecutor;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutor;
@@ -53,6 +54,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     private PlayerTabViewManager tabViewManager;
     private TabOverlayHandlerFactory tabOverlayHandlerFactory;
     private ConfigTabOverlayManager configTabOverlayManager;
+    private SpectatorPassthroughTabOverlayManager spectatorPassthroughTabOverlayManager;
     private EventListener listener;
     @Getter
     private EventExecutor tabEventQueue;
@@ -131,7 +133,8 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                 .build();
         yaml = ConfigTabOverlayManager.constructYamlInstance(options);
 
-        configTabOverlayManager = new ConfigTabOverlayManager(new MyPlatform(),
+        MyPlatform platform = new MyPlatform();
+        configTabOverlayManager = new ConfigTabOverlayManager(platform,
                 playerManager,
                 hasPlaceholderAPI
                         ? new PAPIAwarePlayerPlaceholderResolver()
@@ -142,6 +145,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                 getLogger(),
                 tabEventQueue,
                 iconManager);
+        spectatorPassthroughTabOverlayManager = new SpectatorPassthroughTabOverlayManager(platform, tabEventQueue, ATODataKeys.GAMEMODE);
 
         getServer().getScheduler().scheduleSyncDelayedTask(this, this::onServerFullyLoaded);
         getServer().getPluginManager().registerEvents(this, this);
@@ -238,6 +242,12 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
 
     public void reload() {
         loadMainConfig();
+
+        if (config.disableCustomTabListForSpectators) {
+            spectatorPassthroughTabOverlayManager.enable();
+        } else {
+            spectatorPassthroughTabOverlayManager.disable();
+        }
 
         if (config.customPlaceholders != null) {
             val customPlaceholders = new HashMap<String, CustomPlaceholderConfiguration>();
