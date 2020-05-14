@@ -41,8 +41,10 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -55,7 +57,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     private TabOverlayHandlerFactory tabOverlayHandlerFactory;
     private ConfigTabOverlayManager configTabOverlayManager;
     private SpectatorPassthroughTabOverlayManager spectatorPassthroughTabOverlayManager;
-    private EventListener listener;
+    private List<EventListener> listeners = new ArrayList<>();
     @Getter
     private EventExecutor tabEventQueue;
     @Getter
@@ -209,7 +211,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         TabView tabView = tabViewManager.get(bukkitPlayer);
         tabView.getTabOverlayProviders().activate(tabOverlayHandlerFactory.create(bukkitPlayer));
         tabOverlayHandlerFactory.onCreated(tabView, bukkitPlayer);
-        if (listener != null) {
+        for (EventListener listener : listeners) {
             listener.onTabViewAdded(tabView, player);
         }
     }
@@ -220,7 +222,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         playerManager.onPlayerDisconnect(player);
         TabView tabView = tabViewManager.get(player);
         tabViewManager.removeFromPlayer(player);
-        if (listener != null) {
+        for (EventListener listener : listeners) {
             listener.onTabViewRemoved(tabView);
         }
         tabView.deactivate();
@@ -282,7 +284,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
 
         @Override
         public void addEventListener(EventListener listener) {
-            AdvancedTabOverlay.this.listener = listener;
+            AdvancedTabOverlay.this.listeners.add(listener);
         }
     }
 }
