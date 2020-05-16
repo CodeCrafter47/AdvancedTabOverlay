@@ -1,6 +1,7 @@
 [Dev Builds]: https://ci.codecrafter47.de/job/AdvancedTabOverlay/
 [ProtocolLib]: https://www.spigotmc.org/resources/1997/
 [Wiki]: https://github.com/CodeCrafter47/AdvancedTabOverlay/wiki
+[spigot]: https://www.spigotmc.org/resources/advancedtaboverlay.78905/
 
 # AdvancedTabOverlay
 AdvancedTabOverlay is a tab list plugin for Spigot, which provides highly customisable features including but not limited to:
@@ -18,5 +19,5 @@ AdvancedTabOverlay is a tab list plugin for Spigot, which provides highly custom
 - So much more...
 
 # Installation
-Download the Latest release <!-- TODO: Spigot Link --> ([Dev Builds]) and [ProtocolLib] (required) and install both on your Spigot Server.  
+Download the [latest release][spigot] ([Dev Builds]) and [ProtocolLib] (required) and install both on your Spigot Server.  
 After that, head over to the [Wiki] to learn about how to configure the plugin to your needs.
