@@ -71,6 +71,9 @@ public class PlayersByWorldComponentConfiguration extends MarkedPropertyBase imp
 
 
         TemplateCreationContext childContextS = tcc.clone();
+        if (fillSlotsVertical) {
+            childContextS.setColumns(1);
+        }
         childContextS.addPlaceholderResolver(new WorldPlaceholderResolver());
 
         TemplateCreationContext childContextP = childContextS.clone();
@@ -79,6 +82,9 @@ public class PlayersByWorldComponentConfiguration extends MarkedPropertyBase imp
         childContextP.setPlayerAvailable(true);
 
         TemplateCreationContext childContextM = tcc.clone();
+        if (fillSlotsVertical) {
+            childContextM.setColumns(1);
+        }
         childContextM.addPlaceholderResolver(new OtherCountPlaceholderResolver());
 
         ComponentTemplate playerComponentTemplate = tcc.emptyComponent(); // dummy

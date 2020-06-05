@@ -70,7 +70,7 @@ public class PlayersByWorldComponentTemplate implements ComponentTemplate {
 
     @Override
     public ComponentView instantiate() {
-        return new ContainerComponentView(new PartitionedPlayersView(columns, playerSet, playerComponent, playerComponent.getLayoutInfo().getMinSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getMinSize(), playerOrder, defaultText, defaultPing, defaultIcon, partitionFunction, worldHeader, worldFooter, worldSeparator, minSizePerWorld, maxSizePerWorld, (parent, sectionId, playerSet1) -> {
+        return new ContainerComponentView(new PartitionedPlayersView(fillSlotsVertical ? 1 : columns, playerSet, playerComponent, playerComponent.getLayoutInfo().getMinSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getMinSize(), playerOrder, defaultText, defaultPing, defaultIcon, partitionFunction, worldHeader, worldFooter, worldSeparator, minSizePerWorld, maxSizePerWorld, (parent, sectionId, playerSet1) -> {
             Context child = parent.clone();
             child.setCustomObject(ATOContextKeys.WORLD_ID, sectionId);
             child.setCustomObject(ATOContextKeys.WORLD_PLAYER_SET, playerSet1);
