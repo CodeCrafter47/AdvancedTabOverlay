@@ -1,5 +1,11 @@
 package de.codecrafter47.taboverlay.bukkit;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.ListenerOptions;
+import com.comphenix.protocol.events.ListeningWhitelist;
+import com.comphenix.protocol.events.PacketListener;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.taboverlay.TabView;
@@ -38,13 +44,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -187,6 +191,51 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
 
     @SneakyThrows
     private void onServerFullyLoaded() {
+
+        ProtocolManager pm = ProtocolLibrary.getProtocolManager();
+        List<PacketListener> incompatibleListeners = new ArrayList<>();
+        for (PacketListener listener : pm.getPacketListeners()) {
+            Set<PacketType> types = listener.getSendingWhitelist().getTypes();
+            Set<ListenerOptions> options = listener.getSendingWhitelist().getOptions();
+            if (!options.contains(ListenerOptions.ASYNC) &&
+                    (types.contains(PacketType.Play.Server.PLAYER_INFO)
+                            || types.contains(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER))
+                    || types.contains(PacketType.Play.Server.SCOREBOARD_TEAM)) {
+                incompatibleListeners.add(listener);
+            }
+        }
+        if (!incompatibleListeners.isEmpty()) {
+            getLogger().severe("--------------------------------------");
+            getLogger().severe("INCOMPATIBLE PACKET LISTENERS DETECTED");
+            getLogger().severe("--------------------------------------");
+            for (PacketListener listener : incompatibleListeners) {
+                String clazz = listener.getClass().getName();
+                String plugin = listener.getPlugin().getName();
+                getLogger().severe("");
+                getLogger().severe("> Class: " + clazz);
+                getLogger().severe("  Plugin: " + plugin);
+                getLogger().severe("  Intercepts one of PLAYER_INFO, PLAYER_LIST_HEADER_FOOTER or SCOREBOARD_TEAM but does not have the ASYNC option set.");
+                getLogger().severe("  Please tell the plugin author to make the listener thread safe and set ListenerOptions.ASYNC for compatibility with AdvancedTabOverlay.");
+                getLogger().severe("  AdvancedTabOverlay will try to enable ListenerOptions.ASYNC for this listener to prevent incompatibilities. This might prevent " + plugin + " from working correctly.");
+                try {
+                    ListeningWhitelist sendingWhitelist = listener.getSendingWhitelist();
+                    Field options = ListeningWhitelist.class.getDeclaredField("options");
+                    options.setAccessible(true);
+                    ((Set<ListenerOptions>) options.get(sendingWhitelist)).add(ListenerOptions.ASYNC);
+                } catch (Throwable th) {
+                    getLogger().severe("  Failed to set ListenerOptions.ASYNC: " + th.getMessage());
+                }
+            }
+            // Remove and re-add all listener to force ProtocolLib to recompute the mainThreadFilters set
+            ImmutableSet<PacketListener> packetListeners = pm.getPacketListeners();
+            for (PacketListener listener : packetListeners) {
+                pm.removePacketListener(listener);
+            }
+            for (PacketListener listener : packetListeners) {
+                pm.addPacketListener(listener);
+            }
+        }
+
         Path tabLists = getDataFolder().toPath().resolve("tabLists");
         Files.createDirectories(tabLists);
         reload();
