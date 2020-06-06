@@ -3,12 +3,15 @@ package de.codecrafter47.taboverlay.bukkit.internal.handler.safe;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.*;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import de.codecrafter47.taboverlay.bukkit.internal.util.BitSet;
 import de.codecrafter47.taboverlay.bukkit.internal.util.ConcurrentBitSet;
-import de.codecrafter47.taboverlay.bukkit.internal.util.FastChat;
+import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.handler.TabOverlayHandle;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.SneakyThrows;
@@ -544,7 +547,7 @@ abstract class CustomContentOperationModeHandler<R extends CustomContentOperatio
         }
 
         void setTextInternal(int index, @Nonnull String text) {
-            String jsonText = FastChat.legacyTextToJson(text);
+            String jsonText = ChatFormat.formattedTextToJson(text);
             if (!jsonText.equals(this.text[index])) {
                 this.text[index] = jsonText;
                 dirtyFlagsText.set(index);
@@ -553,7 +556,7 @@ abstract class CustomContentOperationModeHandler<R extends CustomContentOperatio
         }
 
         void setTextInternal(int index, @Nonnull String text, char alternateColorChar) {
-            String jsonText = FastChat.legacyTextToJson(text, alternateColorChar);
+            String jsonText = ChatFormat.formattedTextToJson(text);
             if (!jsonText.equals(this.text[index])) {
                 this.text[index] = jsonText;
                 dirtyFlagsText.set(index);
