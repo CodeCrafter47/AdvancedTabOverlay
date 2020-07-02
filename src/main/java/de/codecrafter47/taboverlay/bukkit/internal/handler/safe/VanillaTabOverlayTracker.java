@@ -54,7 +54,11 @@ final class VanillaTabOverlayTracker {
             switch (action) {
                 case ADD_PLAYER:
                     for (PlayerInfoData infoData : data) {
-                        PlayerListEntry entry = new PlayerListEntry(infoData);
+                        PlayerListEntry entry = playerListEntries.remove(infoData.getProfile().getUUID());
+                        if (entry != null) {
+                            fireOnPlayerRemoved(ctx, entry);
+                        }
+                        entry = new PlayerListEntry(infoData);
                         playerListEntries.put(infoData.getProfile().getUUID(), entry);
                         fireOnPlayerAdded(ctx, entry);
                     }
