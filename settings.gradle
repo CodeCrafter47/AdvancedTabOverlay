@@ -18,3 +18,4 @@
 rootProject.name = 'AdvancedTabOverlay'
 
 includeBuild 'TabOverlayCommon'
+includeBuild 'minecraft-data-api'
