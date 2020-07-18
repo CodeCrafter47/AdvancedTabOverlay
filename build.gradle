@@ -111,5 +111,7 @@ processResources {
 shadowJar {
     relocate 'codecrafter47.util', 'de.codecrafter47.taboverlay.libs.util'
     relocate 'org.bstats', 'de.codecrafter47.taboverlay.libs.bstats'
+    relocate 'it.unimi.dsi.fastutil', 'decodecrafter47.taboverlay.libs.fastutil'
     classifier = null
+    minimize()
 }
