@@ -82,11 +82,5 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
             
             tablistHandler.networkTick(ctx);
         }
-
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            super.exceptionCaught(ctx, cause);
-            cause.printStackTrace(); // todo remove
-        }
     }
 }
