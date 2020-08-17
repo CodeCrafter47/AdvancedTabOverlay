@@ -29,7 +29,9 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
     public SafeTabOverlayHandlerFactory() throws IllegalStateException {
         PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
         int size = packet.getStrings().getFields().size();
-        if (size == 6) {
+        if (size == 5) {
+            packetHelper = new PacketHelper1_8();
+        } else if (size == 6) {
             packetHelper = new PacketHelper1_12();
         } else if (size == 3) {
             packetHelper = new PacketHelper1_13();
@@ -69,18 +71,20 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            val packet = PacketContainer.fromPacket(msg);
-            if (interceptedPacketTypes.contains(packet.getType())) {
-                PacketContainer clonedPacket = packet.shallowClone();
-                if (tablistHandler.onPacketSending(ctx, packet)) {
-                    super.write(ctx, packet.getHandle(), promise);
+            if (PacketType.hasClass(msg.getClass())) {
+                val packet = PacketContainer.fromPacket(msg);
+                if (interceptedPacketTypes.contains(packet.getType())) {
+                    PacketContainer clonedPacket = packet.shallowClone();
+                    if (tablistHandler.onPacketSending(ctx, packet)) {
+                        super.write(ctx, packet.getHandle(), promise);
+                    }
+                    tablistHandler.onPacketSent(ctx, clonedPacket);
+                } else {
+                    super.write(ctx, msg, promise);
                 }
-                tablistHandler.onPacketSent(ctx, clonedPacket);
-            } else {
-                super.write(ctx, msg, promise);
+
+                tablistHandler.networkTick(ctx);
             }
-            
-            tablistHandler.networkTick(ctx);
         }
     }
 }

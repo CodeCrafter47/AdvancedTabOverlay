@@ -45,6 +45,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -89,7 +90,11 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         getCommand("ato").setTabCompleter(Completer.create().any("reload", "info"));
         Executor executor = (task) -> getServer().getScheduler().runTaskAsynchronously(this, task);
         asyncExecutor = new DefaultEventExecutorGroup(4);
-        tabEventQueue = new DefaultEventExecutor();
+        if ((Class.forName("io.netty.util.concurrent.DefaultEventExecutor").getModifiers() & Modifier.PUBLIC) != 0) {
+            tabEventQueue = new DefaultEventExecutor();
+        } else {
+            tabEventQueue = new DefaultEventExecutorGroup(1).next();
+        }
         playerManager = new PlayerManager(this);
 
         tabViewManager = new PlayerTabViewManager(this, getLogger(), asyncExecutor);
