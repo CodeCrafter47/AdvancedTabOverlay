@@ -158,7 +158,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                 iconManager);
         spectatorPassthroughTabOverlayManager = new SpectatorPassthroughTabOverlayManager(platform, tabEventQueue, ATODataKeys.GAMEMODE);
 
-        getServer().getScheduler().scheduleSyncDelayedTask(this, this::onServerFullyLoaded);
+        getServer().getScheduler().runTaskLater(this, this::onServerFullyLoaded, 20);
         getServer().getPluginManager().registerEvents(this, this);
         dataManager.enable();
 
