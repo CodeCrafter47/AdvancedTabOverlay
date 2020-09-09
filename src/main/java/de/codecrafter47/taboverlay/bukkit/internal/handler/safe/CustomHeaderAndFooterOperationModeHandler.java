@@ -4,6 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.handler.HeaderAndFooterHandle;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.SneakyThrows;
@@ -65,8 +66,8 @@ final class CustomHeaderAndFooterOperationModeHandler extends AbstractOperationM
 
         @Override
         public void setHeaderFooter(@Nullable String header, @Nullable String footer) {
-            WrappedChatComponent headerComponent = header != null ? WrappedChatComponent.fromText(header) : SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY;
-            WrappedChatComponent footerComponent = footer != null ? WrappedChatComponent.fromText(footer) : SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY;
+            WrappedChatComponent headerComponent = header != null ? WrappedChatComponent.fromJson(ChatFormat.formattedTextToJson(header)) : SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY;
+            WrappedChatComponent footerComponent = footer != null ? WrappedChatComponent.fromJson(ChatFormat.formattedTextToJson(footer)) : SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY;
             if (!Objects.equals(this.header, headerComponent) || !Objects.equals(this.footer, footerComponent)) {
                 this.header = headerComponent;
                 this.footer = footerComponent;
@@ -82,7 +83,7 @@ final class CustomHeaderAndFooterOperationModeHandler extends AbstractOperationM
 
         @Override
         public void setHeader(@Nullable String header) {
-            WrappedChatComponent headerComponent = header != null ? WrappedChatComponent.fromText(header) : SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY;
+            WrappedChatComponent headerComponent = header != null ? WrappedChatComponent.fromJson(ChatFormat.formattedTextToJson(header)) : SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY;
             if (!Objects.equals(this.header, headerComponent)) {
                 this.header = headerComponent;
                 markDirty();
@@ -96,7 +97,7 @@ final class CustomHeaderAndFooterOperationModeHandler extends AbstractOperationM
 
         @Override
         public void setFooter(@Nullable String footer) {
-            WrappedChatComponent footerComponent = footer != null ? WrappedChatComponent.fromText(footer) : SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY;
+            WrappedChatComponent footerComponent = footer != null ? WrappedChatComponent.fromJson(ChatFormat.formattedTextToJson(footer)) : SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY;
             if (!Objects.equals(this.footer, footerComponent)) {
                 this.footer = footerComponent;
                 markDirty();
