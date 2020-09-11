@@ -1,14 +1,34 @@
+/*
+ *     Copyright (C) 2020 Florian Stober
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.codecrafter47.taboverlay.bukkit.internal;
 
 import com.google.common.collect.Sets;
-import de.codecrafter47.data.api.*;
+import de.codecrafter47.data.api.DataAccess;
+import de.codecrafter47.data.api.DataCache;
+import de.codecrafter47.data.api.DataKey;
+import de.codecrafter47.data.api.JoinedDataAccess;
 import de.codecrafter47.data.bukkit.PlayerDataAccess;
 import de.codecrafter47.taboverlay.bukkit.AdvancedTabOverlay;
 import de.codecrafter47.taboverlay.util.Unchecked;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
