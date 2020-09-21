@@ -123,12 +123,21 @@ final class VanillaTabOverlayTracker {
             String teamName = packetHelper.getTeamName(packet);
             switch (packetHelper.getTeamMode(packet)) {
                 case CREATE:
-                    // todo what happens if we create a team that already exists
+                    // remove if already exists
+                    Set<String> playerSet = teamPlayers.remove(teamName);
+                    if (playerSet != null) {
+                        for (String player : playerSet) {
+                            if (playerToTeamMap.remove(player, teamName)) {
+                                fireOnPlayerRemovedFromTeam(ctx, player, teamName);
+                            }
+                        }
+                    }
+                    // add
                     Collection<String> players = packetHelper.getTeamPlayers(packet);
                     PacketHelper.TeamProperties properties = packetHelper.getTeamProperties(packet);
                     this.teamProperties.put(teamName, properties);
-                    fireOnTeamPropertiesUpdated(ctx, teamName, properties);
                     teamPlayers.put(teamName, new HashSet<>(players));
+                    fireOnTeamPropertiesUpdated(ctx, teamName, properties);
                     for (String player : players) {
                         String oldTeam = playerToTeamMap.put(player, teamName);
                         if (oldTeam != null) {
@@ -139,7 +148,7 @@ final class VanillaTabOverlayTracker {
                     break;
                 case REMOVE:
                     this.teamProperties.remove(teamName);
-                    Set<String> playerSet = teamPlayers.remove(teamName);
+                    playerSet = teamPlayers.remove(teamName);
                     if (playerSet != null) {
                         for (String player : playerSet) {
                             if (playerToTeamMap.remove(player, teamName)) {
@@ -155,19 +164,27 @@ final class VanillaTabOverlayTracker {
                     break;
                 case ADD_PLAYERS:
                     players = packetHelper.getTeamPlayers(packet);
-                    for (String player : players) {
-                        String oldTeam = playerToTeamMap.put(player, teamName);
-                        if (oldTeam != null) {
-                            fireOnPlayerRemovedFromTeam(ctx, player, oldTeam);
+                    playerSet = this.teamPlayers.get(teamName);
+                    if (playerSet != null) {
+                        playerSet.addAll(players);
+                        for (String player : players) {
+                            String oldTeam = playerToTeamMap.put(player, teamName);
+                            if (oldTeam != null) {
+                                fireOnPlayerRemovedFromTeam(ctx, player, oldTeam);
+                            }
+                            fireOnPlayerAddedToTeam(ctx, player, teamName);
                         }
-                        fireOnPlayerAddedToTeam(ctx, player, teamName);
                     }
                     break;
                 case REMOVE_PLAYERS:
                     players = packetHelper.getTeamPlayers(packet);
-                    for (String player : players) {
-                        if (playerToTeamMap.remove(player, teamName)) {
-                            fireOnPlayerRemovedFromTeam(ctx, player, teamName);
+                    playerSet = this.teamPlayers.get(teamName);
+                    if (playerSet != null) {
+                        playerSet.removeAll(players);
+                        for (String player : players) {
+                            if (playerToTeamMap.remove(player, teamName)) {
+                                fireOnPlayerRemovedFromTeam(ctx, player, teamName);
+                            }
                         }
                     }
                     break;
