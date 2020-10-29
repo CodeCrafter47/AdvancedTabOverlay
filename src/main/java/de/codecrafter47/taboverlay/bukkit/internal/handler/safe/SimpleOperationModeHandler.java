@@ -124,38 +124,6 @@ class SimpleOperationModeHandler extends CustomContentOperationModeHandler<Simpl
         }
 
         @Override
-        public void setSlot(int index, @Nullable UUID uuid, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(index, size, "index");
-                beginBatchModification();
-                try {
-                    setUuidInternal(index, uuid);
-                    setIconInternal(index, icon);
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-        }
-
-        @Override
-        public void setSlot(int index, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(index, size, "index");
-                beginBatchModification();
-                try {
-                    setUuidInternal(index, null);
-                    setIconInternal(index, icon);
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-        }
-
-        @Override
         public void setUuid(int index, UUID uuid) {
             if (isValid()) {
                 Preconditions.checkElementIndex(index, size, "index");
@@ -176,14 +144,6 @@ class SimpleOperationModeHandler extends CustomContentOperationModeHandler<Simpl
             if (isValid()) {
                 Preconditions.checkElementIndex(index, size, "index");
                 setTextInternal(index, text);
-            }
-        }
-
-        @Override
-        public void setText(int index, @Nonnull String text, char alternateColorChar) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(index, size, "index");
-                setTextInternal(index, text, alternateColorChar);
             }
         }
 

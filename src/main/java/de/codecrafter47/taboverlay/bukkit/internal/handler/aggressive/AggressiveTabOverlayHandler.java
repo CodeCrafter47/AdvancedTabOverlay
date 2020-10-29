@@ -25,8 +25,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.bukkit.internal.util.Util;
+import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
-import de.codecrafter47.taboverlay.util.Unchecked;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -234,31 +234,15 @@ class AggressiveTabOverlayHandler implements TabOverlayHandler {
             }
 
             @Override
-            public void setHeaderFooter(@Nullable String header, @Nullable String footer, char alternateColorChar) {
-                setHeaderFooter(header != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, header) : null,
-                        footer != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, footer) : null);
-            }
-
-            @Override
             public void setHeader(@Nullable String header) {
                 this.header = header != null ? WrappedChatComponent.fromText(header) : CHAT_COMPONENT_EMPTY;
                 updateHeaderFooter();
             }
 
             @Override
-            public void setHeader(@Nullable String header, char alternateColorChar) {
-                setHeader(header != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, header) : null);
-            }
-
-            @Override
             public void setFooter(@Nullable String footer) {
                 this.footer = footer != null ? WrappedChatComponent.fromText(footer) : CHAT_COMPONENT_EMPTY;
                 updateHeaderFooter();
-            }
-
-            @Override
-            public void setFooter(@Nullable String footer, char alternateColorChar) {
-                setFooter(footer != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, footer) : null);
             }
 
             @Override
@@ -531,11 +515,6 @@ class AggressiveTabOverlayHandler implements TabOverlayHandler {
             }
 
             @Override
-            public void setSlot(int column, int row, @Nullable UUID uuid, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-                setSlot(column, row, uuid, icon, ChatColor.translateAlternateColorCodes(alternateColorChar, text), ping);
-            }
-
-            @Override
             public void setUuid(int column, int row, UUID uuid) {
                 // nothing to do as this TabOverlayHandler doesn't use the uuid
             }
@@ -552,11 +531,6 @@ class AggressiveTabOverlayHandler implements TabOverlayHandler {
                 int index = getIndex(column, row);
                 texts[index] = text;
                 updateSlotText(index);
-            }
-
-            @Override
-            public void setText(int column, int row, @Nonnull String text, char alternateColorChar) {
-                setText(column, row, ChatColor.translateAlternateColorCodes(alternateColorChar, text));
             }
 
             @Override
@@ -603,11 +577,6 @@ class AggressiveTabOverlayHandler implements TabOverlayHandler {
             }
 
             @Override
-            public void setSlot(int index, @Nullable UUID uuid, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-                setSlot(index, icon, ChatColor.translateAlternateColorCodes(alternateColorChar, text), ping);
-            }
-
-            @Override
             public void setUuid(int index, @Nullable UUID uuid) {
                 // nothing to do
             }
@@ -622,11 +591,6 @@ class AggressiveTabOverlayHandler implements TabOverlayHandler {
             public void setText(int index, @Nonnull String text) {
                 texts[index] = text;
                 updateSlotText(index);
-            }
-
-            @Override
-            public void setText(int index, @Nonnull String text, char alternateColorChar) {
-                setText(index, ChatColor.translateAlternateColorCodes(alternateColorChar, text));
             }
 
             @Override

@@ -40,7 +40,7 @@ import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
 import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import de.codecrafter47.taboverlay.config.platform.Platform;
-import de.codecrafter47.taboverlay.spectator.SpectatorPassthroughTabOverlayManager;
+import de.codecrafter47.taboverlay.config.spectator.SpectatorPassthroughTabOverlayManager;
 import io.netty.util.concurrent.DefaultEventExecutor;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutor;

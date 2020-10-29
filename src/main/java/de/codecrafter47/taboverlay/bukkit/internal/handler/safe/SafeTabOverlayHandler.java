@@ -19,10 +19,10 @@ package de.codecrafter47.taboverlay.bukkit.internal.handler.safe;
 
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.ContentOperationMode;
 import de.codecrafter47.taboverlay.handler.HeaderAndFooterOperationMode;
 import de.codecrafter47.taboverlay.handler.TabOverlayHandler;
-import de.codecrafter47.taboverlay.util.Unchecked;
 import io.netty.channel.ChannelHandlerContext;
 import org.bukkit.entity.Player;
 

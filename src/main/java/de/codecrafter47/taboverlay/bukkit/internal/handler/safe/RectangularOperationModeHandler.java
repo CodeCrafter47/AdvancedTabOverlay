@@ -174,42 +174,6 @@ class RectangularOperationModeHandler extends CustomContentOperationModeHandler<
         }
 
         @Override
-        public void setSlot(int column, int row, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(column, size.getColumns(), "column");
-                Preconditions.checkElementIndex(row, size.getRows(), "row");
-                beginBatchModification();
-                try {
-                    int index = index(column, row);
-                    setUuidInternal(index, null);
-                    setIconInternal(index, icon);
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-        }
-
-        @Override
-        public void setSlot(int column, int row, @Nullable UUID uuid, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(column, size.getColumns(), "column");
-                Preconditions.checkElementIndex(row, size.getRows(), "row");
-                beginBatchModification();
-                try {
-                    int index = index(column, row);
-                    setUuidInternal(index, uuid);
-                    setIconInternal(index, icon);
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-        }
-
-        @Override
         public void setUuid(int column, int row, @Nullable UUID uuid) {
             if (isValid()) {
                 Preconditions.checkElementIndex(column, size.getColumns(), "column");
@@ -233,15 +197,6 @@ class RectangularOperationModeHandler extends CustomContentOperationModeHandler<
                 Preconditions.checkElementIndex(column, size.getColumns(), "column");
                 Preconditions.checkElementIndex(row, size.getRows(), "row");
                 setTextInternal(index(column, row), text);
-            }
-        }
-
-        @Override
-        public void setText(int column, int row, @Nonnull String text, char alternateColorChar) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(column, size.getColumns(), "column");
-                Preconditions.checkElementIndex(row, size.getRows(), "row");
-                setTextInternal(index(column, row), text, alternateColorChar);
             }
         }
 

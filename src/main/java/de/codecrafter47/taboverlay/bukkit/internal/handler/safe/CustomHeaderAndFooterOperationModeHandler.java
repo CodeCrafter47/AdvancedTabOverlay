@@ -93,12 +93,6 @@ final class CustomHeaderAndFooterOperationModeHandler extends AbstractOperationM
         }
 
         @Override
-        public void setHeaderFooter(@Nullable String header, @Nullable String footer, char alternateColorChar) {
-            setHeaderFooter(header != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, header) : null,
-                    footer != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, footer) : null);
-        }
-
-        @Override
         public void setHeader(@Nullable String header) {
             WrappedChatComponent headerComponent = header != null ? WrappedChatComponent.fromJson(ChatFormat.formattedTextToJson(header)) : SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY;
             if (!Objects.equals(this.header, headerComponent)) {
@@ -108,22 +102,12 @@ final class CustomHeaderAndFooterOperationModeHandler extends AbstractOperationM
         }
 
         @Override
-        public void setHeader(@Nullable String header, char alternateColorChar) {
-            setHeader(header != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, header) : null);
-        }
-
-        @Override
         public void setFooter(@Nullable String footer) {
             WrappedChatComponent footerComponent = footer != null ? WrappedChatComponent.fromJson(ChatFormat.formattedTextToJson(footer)) : SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY;
             if (!Objects.equals(this.footer, footerComponent)) {
                 this.footer = footerComponent;
                 markDirty();
             }
-        }
-
-        @Override
-        public void setFooter(@Nullable String footer, char alternateColorChar) {
-            setFooter(footer != null ? ChatColor.translateAlternateColorCodes(alternateColorChar, footer) : null);
         }
 
         @Override

@@ -24,7 +24,7 @@ import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.api.JoinedDataAccess;
 import de.codecrafter47.data.bukkit.PlayerDataAccess;
 import de.codecrafter47.taboverlay.bukkit.AdvancedTabOverlay;
-import de.codecrafter47.taboverlay.util.Unchecked;
+import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
