@@ -47,7 +47,7 @@ public class PAPIAwarePlayerPlaceholderResolver extends PlayerPlaceholderResolve
                 String token = args.get(0).getText();
                 Set<String> prefixes = PlaceholderAPI.getRegisteredPlaceholderPlugins();
                 for (String prefix : prefixes) {
-                    if (token.substring(0, prefix.length()).equalsIgnoreCase(prefix)) {
+                    if (token.length() >= prefix.length() && token.substring(0, prefix.length()).equalsIgnoreCase(prefix)) {
                         args.remove(0);
                         val resolver = create(ATODataKeys.createPlaceholderAPIDataKey("%" + token + "%"));
                         addPlaceholder(token, resolver);
