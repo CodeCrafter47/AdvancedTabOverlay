@@ -33,7 +33,7 @@ plugins {
 }
 
 group 'de.codecrafter47.taboverlay'
-version '1.2.2'
+version '1.2.3-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
