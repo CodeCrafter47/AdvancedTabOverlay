@@ -101,6 +101,8 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
                 }
 
                 tablistHandler.networkTick(ctx);
+            } else {
+                super.write(ctx, msg, promise);
             }
         }
     }
