@@ -104,7 +104,13 @@ public class DataManager {
                 }
                 if (!Objects.equals(o, get(dataKey))) {
                     Object finalO = o;
-                    tabEventQueue.execute(() -> super.updateValue(dataKey, finalO));
+                    tabEventQueue.submit(() -> {
+                        try {
+                            super.updateValue(dataKey, finalO);
+                        } catch (Throwable th) {
+                            plugin.getLogger().log(Level.SEVERE, "Unexpected exception.", th);
+                        }
+                    });
                 }
             }
         }
