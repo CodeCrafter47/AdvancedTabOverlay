@@ -29,12 +29,15 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class MainConfig implements UpdateableConfig {
 
     public Map<String, CustomPlaceholderConfiguration> customPlaceholders = new HashMap<>();
 
     public boolean disableCustomTabListForSpectators = true;
+
+    public String timeZone = TimeZone.getDefault().getID();
 
     public transient boolean needWrite = false;
 
@@ -49,7 +52,8 @@ public class MainConfig implements UpdateableConfig {
 
         val newConfigOptions = ImmutableList.<String>of(
                 "customPlaceholders",
-                "disableCustomTabListForSpectators"
+                "disableCustomTabListForSpectators",
+                "timeZone"
         );
 
         for (String option : newConfigOptions) {

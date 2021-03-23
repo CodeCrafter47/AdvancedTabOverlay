@@ -334,6 +334,9 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         }
         configTabOverlayManager.setGlobalCustomPlaceholders(customPlaceholders);
 
+        // update timezone
+        configTabOverlayManager.setTimeZone(TimeZone.getTimeZone(config.timeZone));
+
         Path tabLists = getDataFolder().toPath().resolve("tabLists");
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
     }
