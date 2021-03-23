@@ -105,7 +105,6 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         Metrics metrics = new Metrics(this);
         getCommand("ato").setExecutor(new ATOCommand());
         getCommand("ato").setTabCompleter(Completer.create().any("reload", "info"));
-        Executor executor = (task) -> getServer().getScheduler().runTaskAsynchronously(this, task);
         asyncExecutor = new DefaultEventExecutorGroup(4);
         if ((Class.forName("io.netty.util.concurrent.DefaultEventExecutor").getModifiers() & Modifier.PUBLIC) != 0) {
             tabEventQueue = new DefaultEventExecutor();
@@ -316,21 +315,24 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     public void reload() {
         loadMainConfig();
 
+        // check disableCustomTabListForSpectators config option and enable/ disable the spectator passthrough tab overlay
+        // providers accordingly
         if (config.disableCustomTabListForSpectators) {
             spectatorPassthroughTabOverlayManager.enable();
         } else {
             spectatorPassthroughTabOverlayManager.disable();
         }
 
+        // load the custom placeholders from the global config
+        val customPlaceholders = new HashMap<String, CustomPlaceholderConfiguration>();
         if (config.customPlaceholders != null) {
-            val customPlaceholders = new HashMap<String, CustomPlaceholderConfiguration>();
             for (val entry : config.customPlaceholders.entrySet()) {
                 if (entry.getKey() != null && entry.getValue() != null) {
                     customPlaceholders.put(entry.getKey(), entry.getValue());
                 }
             }
-            configTabOverlayManager.setGlobalCustomPlaceholders(customPlaceholders);
         }
+        configTabOverlayManager.setGlobalCustomPlaceholders(customPlaceholders);
 
         Path tabLists = getDataFolder().toPath().resolve("tabLists");
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
