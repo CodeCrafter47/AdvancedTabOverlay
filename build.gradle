@@ -21,7 +21,7 @@ buildscript {
     }
     repositories {
         maven {
-            url "http://repository.jboss.org/nexus/content/groups/public/"
+            url "https://repository.jboss.org/nexus/content/groups/public/"
         }
         mavenLocal()
         mavenCentral()
@@ -48,7 +48,7 @@ repositories {
         url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
     }
     maven {
-        url "http://nexus.codecrafter47.dyndns.eu/content/repositories/public/"
+        url "https://nexus.codecrafter47.de/content/repositories/public/"
     }
     maven {
         url "https://repo.dmulloy2.net/nexus/repository/public/"
@@ -60,10 +60,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.12'
-    annotationProcessor 'org.projectlombok:lombok:1.18.12'
-    testCompileOnly 'org.projectlombok:lombok:1.18.12'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
 
     compileOnly "com.google.code.findbugs:jsr305:3.0.1"
     compileOnly "org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT"
@@ -87,7 +87,7 @@ publishing {
     repositories {
         maven {
             name "deployment"
-            url "http://nexus.codecrafter47.dyndns.eu/content/repositories/snapshots/"
+            url "https://nexus.codecrafter47.de/content/repositories/snapshots/"
         }
     }
 
