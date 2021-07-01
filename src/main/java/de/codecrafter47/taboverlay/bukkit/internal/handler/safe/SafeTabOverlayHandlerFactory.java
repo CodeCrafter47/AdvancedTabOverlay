@@ -52,6 +52,8 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
             packetHelper = new PacketHelper1_12();
         } else if (size == 3) {
             packetHelper = new PacketHelper1_13();
+        } else if (size == 1) {
+            packetHelper = new PacketHelper1_17();
         } else {
             throw new IllegalStateException("Unsupported Minecraft version");
         }
