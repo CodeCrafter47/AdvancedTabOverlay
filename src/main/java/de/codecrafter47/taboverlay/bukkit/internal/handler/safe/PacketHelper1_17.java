@@ -108,13 +108,13 @@ class PacketHelper1_17 implements PacketHelper {
     @Override
     public TeamProperties getTeamProperties(PacketContainer packet) {
         InternalStructure struct = packet.getOptionalStructures().read(0).get();
-        val display = packet.getChatComponents().read(0);
-        val prefix = packet.getChatComponents().read(1);
-        val suffix = packet.getChatComponents().read(2);
-        val nameTagVisibility = packet.getStrings().read(0);
-        val collisionRule = packet.getStrings().read(1);
-        val color = packet.getEnumModifier(ChatColor.class, 5).read(0);
-        val friendlyFire = packet.getIntegers().read(0);
+        val display = struct.getChatComponents().read(0);
+        val prefix = struct.getChatComponents().read(1);
+        val suffix = struct.getChatComponents().read(2);
+        val nameTagVisibility = struct.getStrings().read(0);
+        val collisionRule = struct.getStrings().read(1);
+        val color = struct.getEnumModifier(ChatColor.class, 5).read(0);
+        val friendlyFire = struct.getIntegers().read(0);
         return new TeamProperties() {
             @Override
             public void applyTo(PacketContainer packet) {
