@@ -29,15 +29,19 @@ import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 public class ATODataAccess extends AbstractBukkitDataAccess<Player> {
 
-    private static FieldAccessor PING;
+    private static Function<Player, Integer> PING;
     private final PlayerDataAccess playerDataAccess;
 
     public ATODataAccess(Logger logger, Plugin plugin) {
@@ -68,10 +72,24 @@ public class ATODataAccess extends AbstractBukkitDataAccess<Player> {
     @SneakyThrows
     private static Integer getPlayerPing(Player player) {
         if (PING == null) {
-            PING = Accessors.getFieldAccessor(MinecraftReflection.getEntityPlayerClass(), "ping", false);
+            try {
+                val acessor = Accessors.getFieldAccessor(MinecraftReflection.getEntityPlayerClass(), "ping", false);
+                PING = player1 -> {
+                    Object nmsPlayer = BukkitUnwrapper.getInstance().unwrapItem(player1);
+                    return (Integer) acessor.get(player1);
+                };
+            } catch (IllegalArgumentException ignored) {
+                val method = Player.class.getMethod("getPing");
+                PING = player1 -> {
+                    try {
+                        return (Integer) method.invoke(player1);
+                    } catch (IllegalAccessException | InvocationTargetException ignored2) {
+                        return -1;
+                    }
+                };
+            }
         }
-        Object nmsPlayer = BukkitUnwrapper.getInstance().unwrapItem(player);
-        return (Integer) PING.get(nmsPlayer);
+        return PING.apply(player);
     }
 
     private static Integer getPlayerGamemode(Player player) {
