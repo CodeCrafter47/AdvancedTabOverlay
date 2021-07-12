@@ -76,7 +76,7 @@ public class ATODataAccess extends AbstractBukkitDataAccess<Player> {
                 val acessor = Accessors.getFieldAccessor(MinecraftReflection.getEntityPlayerClass(), "ping", false);
                 PING = player1 -> {
                     Object nmsPlayer = BukkitUnwrapper.getInstance().unwrapItem(player1);
-                    return (Integer) acessor.get(player1);
+                    return (Integer) acessor.get(nmsPlayer);
                 };
             } catch (IllegalArgumentException ignored) {
                 val method = Player.class.getMethod("getPing");
