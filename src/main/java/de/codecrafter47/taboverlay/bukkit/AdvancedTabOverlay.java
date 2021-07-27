@@ -236,7 +236,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                 getLogger().severe("> Class: " + clazz);
                 getLogger().severe("  Plugin: " + plugin);
                 getLogger().severe("  Intercepts one of PLAYER_INFO, PLAYER_LIST_HEADER_FOOTER or SCOREBOARD_TEAM but does not have the ASYNC option set.");
-                getLogger().severe("  Please tell the plugin author to make the listener thread safe and set ListenerOptions.ASYNC for compatibility with AdvancedTabOverlay.");
+                getLogger().severe("  Please tell the plugin author of " + plugin + " to make the listener thread safe and set ListenerOptions.ASYNC for compatibility with AdvancedTabOverlay.");
                 getLogger().severe("  AdvancedTabOverlay will try to enable ListenerOptions.ASYNC for this listener to prevent incompatibilities. This might prevent " + plugin + " from working correctly.");
                 try {
                     ListeningWhitelist sendingWhitelist = listener.getSendingWhitelist();
