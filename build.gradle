@@ -114,6 +114,7 @@ shadowJar {
     relocate 'org.bstats', 'de.codecrafter47.taboverlay.libs.bstats'
     relocate 'it.unimi.dsi.fastutil', 'de.codecrafter47.taboverlay.libs.fastutil'
     relocate 'org.yaml.snakeyaml', 'de.codecrafter47.taboverlay.libs.snakeyaml'
+    relocate 'org.mineskin', 'de.codecrafter47.taboverlay.libs.mineskin'
     classifier = null
     minimize()
 }
