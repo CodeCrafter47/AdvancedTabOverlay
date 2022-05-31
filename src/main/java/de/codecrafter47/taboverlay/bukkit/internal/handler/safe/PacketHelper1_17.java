@@ -72,7 +72,7 @@ class PacketHelper1_17 implements PacketHelper {
     public PacketContainer removePlayerFromTeam(String teamName, String player) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
         packet.getStrings().write(0, teamName);
-        packet.getIntegers().write(0, 3); // mode: add player
+        packet.getIntegers().write(0, 4); // mode: remove player
         packet.getSpecificModifier(Collection.class).write(0, Collections.singleton(player));
         return packet;
     }
