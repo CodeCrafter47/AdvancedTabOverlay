@@ -337,6 +337,10 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         // update timezone
         configTabOverlayManager.setTimeZone(TimeZone.getTimeZone(config.timeZone));
 
+        // clear icon cache
+        iconManager.clearCache();
+        
+        // load tab lists
         Path tabLists = getDataFolder().toPath().resolve("tabLists");
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
     }
