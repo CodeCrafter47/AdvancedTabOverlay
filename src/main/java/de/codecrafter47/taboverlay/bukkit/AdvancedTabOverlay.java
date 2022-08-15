@@ -174,7 +174,14 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
                 iconManager);
         spectatorPassthroughTabOverlayManager = new SpectatorPassthroughTabOverlayManager(platform, tabEventQueue, ATODataKeys.GAMEMODE);
 
-        getServer().getScheduler().runTaskLater(this, this::onServerFullyLoaded, 20);
+        if (hasPlaceholderAPI) {
+            val listener = new PAPIListener(() -> {
+                getServer().getScheduler().runTaskLater(this, this::onServerFullyLoaded, 20);
+            });
+            getServer().getPluginManager().registerEvents(listener, this);
+        } else {
+            getServer().getScheduler().runTaskLater(this, this::onServerFullyLoaded, 20);
+        }
         getServer().getPluginManager().registerEvents(this, this);
         dataManager.enable();
 
@@ -337,6 +344,10 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         // update timezone
         configTabOverlayManager.setTimeZone(TimeZone.getTimeZone(config.timeZone));
 
+        // clear icon cache
+        iconManager.clearCache();
+        
+        // load tab lists
         Path tabLists = getDataFolder().toPath().resolve("tabLists");
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
     }
