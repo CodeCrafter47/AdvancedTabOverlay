@@ -27,8 +27,6 @@ import org.bukkit.ChatColor;
 
 import java.util.*;
 
-import static org.junit.Assert.assertTrue;
-
 class PacketHelper1_17 implements PacketHelper {
 
     @Override

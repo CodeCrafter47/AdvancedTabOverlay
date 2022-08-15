@@ -41,7 +41,6 @@ import java.util.logging.Logger;
 
 public class ATODataAccess extends AbstractBukkitDataAccess<Player> {
 
-    private static Function<Player, Integer> PING;
     private final PlayerDataAccess playerDataAccess;
 
     public ATODataAccess(Logger logger, Plugin plugin) {
@@ -71,25 +70,7 @@ public class ATODataAccess extends AbstractBukkitDataAccess<Player> {
 
     @SneakyThrows
     private static Integer getPlayerPing(Player player) {
-        if (PING == null) {
-            try {
-                val acessor = Accessors.getFieldAccessor(MinecraftReflection.getEntityPlayerClass(), "ping", false);
-                PING = player1 -> {
-                    Object nmsPlayer = BukkitUnwrapper.getInstance().unwrapItem(player1);
-                    return (Integer) acessor.get(nmsPlayer);
-                };
-            } catch (IllegalArgumentException ignored) {
-                val method = Player.class.getMethod("getPing");
-                PING = player1 -> {
-                    try {
-                        return (Integer) method.invoke(player1);
-                    } catch (IllegalAccessException | InvocationTargetException ignored2) {
-                        return -1;
-                    }
-                };
-            }
-        }
-        return PING.apply(player);
+        return player.getPing();
     }
 
     private static Integer getPlayerGamemode(Player player) {
