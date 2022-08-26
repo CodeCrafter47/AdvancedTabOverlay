@@ -432,6 +432,9 @@ abstract class CustomContentOperationModeHandler<R extends CustomContentOperatio
     }
 
     private void customSlot(ChannelHandlerContext ctx, int index) {
+        if (slotState[index] == SlotState.CUSTOM) {
+            retireSlot(ctx, index);
+        }
         representation.dirtyFlagsIcon.clear(index);
         representation.dirtyFlagsText.clear(index);
         representation.dirtyFlagsPing.clear(index);
