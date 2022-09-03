@@ -19,29 +19,32 @@ package de.codecrafter47.taboverlay.bukkit.internal.handler.safe;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.InternalStructure;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.*;
 import lombok.val;
+import org.bukkit.ChatColor;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-class PacketHelper1_12 implements PacketHelper {
+class PacketHelper1_19 implements PacketHelper {
 
     @Override
     public PacketContainer createTeam(String teamName, Set<String> players) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
         packet.getStrings().write(0, teamName);
-        packet.getIntegers().write(1, 0); // mode: create team
-        packet.getStrings().write(1, ""); // display
-        packet.getStrings().write(2, ""); // prefix
-        packet.getStrings().write(3, ""); // suffix
-        packet.getStrings().write(4, "always"); // name tag visibility
-        packet.getStrings().write(5, "always"); // collision rule
-        packet.getIntegers().write(0, -1);
-        packet.getIntegers().write(2, 1); // friendlyFire
+        packet.getIntegers().write(0, 0); // mode: create team
+
+        InternalStructure struct = packet.getOptionalStructures().read(0).get();
+        struct.getChatComponents().write(0, SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY); // display
+        struct.getChatComponents().write(1, SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY); // prefix
+        struct.getChatComponents().write(2, SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY); // suffix
+        struct.getStrings().write(0, "always"); // name tag visibility
+        struct.getStrings().write(1, "always"); // collision rule
+        struct.getEnumModifier(ChatColor.class, 5).write(0, ChatColor.RESET);
+        struct.getIntegers().write(0, 1); // friendlyFire
+        packet.getOptionalStructures().write(0, Optional.of(struct));
+
         packet.getSpecificModifier(Collection.class).write(0, players); // players
         return packet;
     }
@@ -50,7 +53,7 @@ class PacketHelper1_12 implements PacketHelper {
     public PacketContainer removeTeam(String teamName) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
         packet.getStrings().write(0, teamName);
-        packet.getIntegers().write(1, 1); // mode: remove team
+        packet.getIntegers().write(0, 1); // mode: remove team
         return packet;
     }
 
@@ -58,7 +61,7 @@ class PacketHelper1_12 implements PacketHelper {
     public PacketContainer addPlayerToTeam(String teamName, String player) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
         packet.getStrings().write(0, teamName);
-        packet.getIntegers().write(1, 3); // mode: add player
+        packet.getIntegers().write(0, 3); // mode: add player
         packet.getSpecificModifier(Collection.class).write(0, Collections.singleton(player));
         return packet;
     }
@@ -67,7 +70,7 @@ class PacketHelper1_12 implements PacketHelper {
     public PacketContainer removePlayerFromTeam(String teamName, String player) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
         packet.getStrings().write(0, teamName);
-        packet.getIntegers().write(1, 4); // mode: remove player
+        packet.getIntegers().write(0, 4); // mode: remove player
         packet.getSpecificModifier(Collection.class).write(0, Collections.singleton(player));
         return packet;
     }
@@ -76,7 +79,7 @@ class PacketHelper1_12 implements PacketHelper {
     public PacketContainer updateTeam(String name, TeamProperties properties) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
         packet.getStrings().write(0, name);
-        packet.getIntegers().write(1, 2);
+        packet.getIntegers().write(0, 2);
         properties.applyTo(packet);
         return packet;
     }
@@ -85,43 +88,51 @@ class PacketHelper1_12 implements PacketHelper {
     public PacketContainer updateTeamWithDefaults(String name) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
         packet.getStrings().write(0, name);
-        packet.getIntegers().write(1, 2);
-        packet.getStrings().write(1, ""); // display
-        packet.getStrings().write(2, ""); // prefix
-        packet.getStrings().write(3, ""); // suffix
-        packet.getStrings().write(4, "always"); // name tag visibility
-        packet.getStrings().write(5, "always"); // collision rule
-        packet.getIntegers().write(0, -1);
-        packet.getIntegers().write(2, 1); // friendlyFire
+        packet.getIntegers().write(0, 2);
+
+        InternalStructure struct = packet.getOptionalStructures().read(0).get();
+        struct.getChatComponents().write(0, SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY); // display
+        struct.getChatComponents().write(1, SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY); // prefix
+        struct.getChatComponents().write(2, SafeTabOverlayHandler.CHAT_COMPONENT_EMPTY); // suffix
+        struct.getStrings().write(0, "always"); // name tag visibility
+        struct.getStrings().write(1, "always"); // collision rule
+        struct.getEnumModifier(ChatColor.class, 5).write(0, ChatColor.RESET);
+        struct.getIntegers().write(0, 1); // friendlyFire
+        packet.getOptionalStructures().write(0, Optional.of(struct));
+
         return packet;
     }
 
     @Override
     public TeamProperties getTeamProperties(PacketContainer packet) {
-        val display = packet.getStrings().read(1);
-        val prefix = packet.getStrings().read(2);
-        val suffix = packet.getStrings().read(3);
-        val nameTagVisibility = packet.getStrings().read(4);
-        val collisionRule = packet.getStrings().read(5);
-        val color = packet.getIntegers().read(0);
-        val friendlyFire = packet.getIntegers().read(2);
+        InternalStructure struct = packet.getOptionalStructures().read(0).get();
+        val display = struct.getChatComponents().read(0);
+        val prefix = struct.getChatComponents().read(1);
+        val suffix = struct.getChatComponents().read(2);
+        val nameTagVisibility = struct.getStrings().read(0);
+        val collisionRule = struct.getStrings().read(1);
+        val color = struct.getEnumModifier(ChatColor.class, 5).read(0);
+        val friendlyFire = struct.getIntegers().read(0);
         return new TeamProperties() {
             @Override
             public void applyTo(PacketContainer packet) {
-                packet.getStrings().write(1, display);
-                packet.getStrings().write(2, prefix);
-                packet.getStrings().write(3, suffix);
-                packet.getStrings().write(4, nameTagVisibility);
-                packet.getStrings().write(5, collisionRule);
-                packet.getIntegers().write(0, color);
-                packet.getIntegers().write(2, friendlyFire);
+
+                InternalStructure struct = packet.getOptionalStructures().read(0).get();
+                struct.getChatComponents().write(0, display);
+                struct.getChatComponents().write(1, prefix);
+                struct.getChatComponents().write(2, suffix);
+                struct.getStrings().write(0, nameTagVisibility);
+                struct.getStrings().write(1, collisionRule);
+                struct.getEnumModifier(ChatColor.class, 5).write(0, color);
+                struct.getIntegers().write(0, friendlyFire);
+                packet.getOptionalStructures().write(0, Optional.of(struct));
             }
         };
     }
 
     @Override
     public TeamMode getTeamMode(PacketContainer packet) {
-        Integer mode = packet.getIntegers().read(1);
+        Integer mode = packet.getIntegers().read(0);
         switch (mode) {
             case 0:
                 return TeamMode.CREATE;
@@ -176,7 +187,7 @@ class PacketHelper1_12 implements PacketHelper {
     public PacketContainer addPlayerListEntry(VanillaTabOverlayTracker.PlayerListEntry entry, WrappedChatComponent displayName, int latency, EnumWrappers.NativeGameMode gameMode) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
         packet.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
-        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(new PlayerInfoData(entry.profile, latency, gameMode, displayName)));
+        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(new PlayerInfoData(entry.profile, latency, gameMode, displayName, ((VanillaTabOverlayTracker.PlayerListEntry119) entry).profileKeyData)));
         return packet;
     }
 
@@ -184,7 +195,7 @@ class PacketHelper1_12 implements PacketHelper {
     public PacketContainer removePlayerListEntry(UUID uuid) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
         packet.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.REMOVE_PLAYER);
-        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(new PlayerInfoData(new WrappedGameProfile(uuid, "dummy"), 0, EnumWrappers.NativeGameMode.NOT_SET, null)));
+        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(new PlayerInfoData(new WrappedGameProfile(uuid, "dummy"), 0, EnumWrappers.NativeGameMode.SURVIVAL, null)));
         return packet;
     }
 
@@ -192,7 +203,7 @@ class PacketHelper1_12 implements PacketHelper {
     public PacketContainer updateDisplayName(UUID uuid, WrappedChatComponent displayName) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
         packet.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME);
-        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(new PlayerInfoData(new WrappedGameProfile(uuid, "dummy"), 0, EnumWrappers.NativeGameMode.NOT_SET, displayName)));
+        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(new PlayerInfoData(new WrappedGameProfile(uuid, "dummy"), 0, EnumWrappers.NativeGameMode.SURVIVAL, displayName)));
         return packet;
     }
 
@@ -200,7 +211,7 @@ class PacketHelper1_12 implements PacketHelper {
     public PacketContainer updateLatency(UUID uuid, int latency) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
         packet.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.UPDATE_LATENCY);
-        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(new PlayerInfoData(new WrappedGameProfile(uuid, "dummy"), latency, EnumWrappers.NativeGameMode.NOT_SET, null)));
+        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(new PlayerInfoData(new WrappedGameProfile(uuid, "dummy"), latency, EnumWrappers.NativeGameMode.SURVIVAL, null)));
         return packet;
     }
 }

@@ -174,10 +174,10 @@ class PacketHelper1_13 implements PacketHelper {
     }
 
     @Override
-    public PacketContainer addPlayerListEntry(WrappedGameProfile gameProfile, WrappedChatComponent displayName, int latency, EnumWrappers.NativeGameMode gameMode) {
+    public PacketContainer addPlayerListEntry(VanillaTabOverlayTracker.PlayerListEntry entry, WrappedChatComponent displayName, int latency, EnumWrappers.NativeGameMode gameMode) {
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
         packet.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
-        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(new PlayerInfoData(gameProfile, latency, gameMode, displayName)));
+        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(new PlayerInfoData(entry.profile, latency, gameMode, displayName)));
         return packet;
     }
 

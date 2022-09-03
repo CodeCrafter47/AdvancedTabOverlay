@@ -54,7 +54,7 @@ public interface PacketHelper {
 
     PacketContainer addPlayerListEntry(UUID uuid, String name, WrappedSignedProperty textureProperty, WrappedChatComponent displayName, int latency);
 
-    PacketContainer addPlayerListEntry(WrappedGameProfile gameProfile, WrappedChatComponent displayName, int latency, EnumWrappers.NativeGameMode gameMode);
+    PacketContainer addPlayerListEntry(VanillaTabOverlayTracker.PlayerListEntry entry, WrappedChatComponent displayName, int latency, EnumWrappers.NativeGameMode gameMode);
 
     PacketContainer removePlayerListEntry(UUID uuid);
 
