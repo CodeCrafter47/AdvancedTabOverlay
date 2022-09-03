@@ -53,7 +53,12 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
         } else if (size == 3) {
             packetHelper = new PacketHelper1_13();
         } else if (size == 1) {
-            packetHelper = new PacketHelper1_17();
+            try {
+                Class.forName("com.comphenix.protocol.wrappers.WrappedProfilePublicKey");
+                packetHelper = new PacketHelper1_19();
+            } catch (ClassNotFoundException e) {
+                packetHelper = new PacketHelper1_17();
+            }
         } else {
             throw new IllegalStateException("Unsupported Minecraft version");
         }

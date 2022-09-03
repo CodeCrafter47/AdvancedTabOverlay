@@ -212,7 +212,7 @@ abstract class CustomContentOperationModeHandler<R extends CustomContentOperatio
     public void onPlayerAdded(ChannelHandlerContext ctx, VanillaTabOverlayTracker.PlayerListEntry entry) {
         UUID uuid = entry.profile.getUUID();
         if (uuid.version() != 2 && !freePlayers.contains(uuid) && !playerUuidToSlotMap.containsKey(uuid)) {
-            PacketContainer packet = packetHelper.addPlayerListEntry(entry.profile, null, 0, uuid.equals(viewerUuid) ? entry.gameMode : EnumWrappers.NativeGameMode.SURVIVAL);
+            PacketContainer packet = packetHelper.addPlayerListEntry(entry, null, 0, uuid.equals(viewerUuid) ? entry.gameMode : EnumWrappers.NativeGameMode.SURVIVAL);
             ctx.write(packet.getHandle(), ctx.newPromise());
             freePlayers.add(uuid);
             teamManager.trackPlayer(ctx, entry.profile.getName());

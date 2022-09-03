@@ -19,10 +19,7 @@ package de.codecrafter47.taboverlay.bukkit.internal.handler.safe;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.PlayerInfoData;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.comphenix.protocol.wrappers.*;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +30,8 @@ import java.util.*;
 final class VanillaTabOverlayTracker {
 
     private PacketHelper packetHelper;
+    
+    private boolean is119;
 
     @Getter
     private WrappedChatComponent header = null;
@@ -58,6 +57,12 @@ final class VanillaTabOverlayTracker {
 
     VanillaTabOverlayTracker(PacketHelper packetHelper) {
         this.packetHelper = packetHelper;
+        try {
+            Class.forName("com.comphenix.protocol.wrappers.WrappedProfilePublicKey");
+            is119 = true;
+        } catch (ClassNotFoundException e) {
+            is119 = false;
+        }
     }
 
     void onPacketSending(PacketContainer packet, ChannelHandlerContext ctx) {
@@ -75,7 +80,11 @@ final class VanillaTabOverlayTracker {
                         if (entry != null) {
                             fireOnPlayerRemoved(ctx, entry);
                         }
-                        entry = new PlayerListEntry(infoData);
+                        if (is119) {
+                            entry = new PlayerListEntry119(infoData);
+                        } else {
+                            entry = new PlayerListEntry(infoData);
+                        }
                         playerListEntries.put(infoData.getProfile().getUUID(), entry);
                         fireOnPlayerAdded(ctx, entry);
                     }
@@ -282,5 +291,15 @@ final class VanillaTabOverlayTracker {
         EnumWrappers.NativeGameMode gameMode;
         WrappedGameProfile profile;
         WrappedChatComponent displayName;
+    }
+    
+    static class PlayerListEntry119 extends PlayerListEntry {
+
+        PlayerListEntry119(PlayerInfoData data) {
+            super(data);
+            profileKeyData = data.getProfileKeyData();
+        }
+        
+        WrappedProfilePublicKey.WrappedProfileKeyData profileKeyData;
     }
 }
