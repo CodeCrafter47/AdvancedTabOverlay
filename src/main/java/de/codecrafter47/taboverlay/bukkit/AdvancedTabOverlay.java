@@ -177,6 +177,8 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         if (hasPlaceholderAPI) {
             val listener = new PAPIListener(() -> {
                 getServer().getScheduler().runTaskLater(this, this::onServerFullyLoaded, 20);
+            }, () -> {
+                getServer().getScheduler().runTaskLater(this, this::softReload, 20);
             });
             getServer().getPluginManager().registerEvents(listener, this);
         } else {
