@@ -49,7 +49,6 @@ public class Util {
 
     @SneakyThrows
     public int getLatency(Player player) {
-        val nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
-        return nmsPlayer.getClass().getField("ping").getInt(nmsPlayer);
+        return player.getPing();
     }
 }
