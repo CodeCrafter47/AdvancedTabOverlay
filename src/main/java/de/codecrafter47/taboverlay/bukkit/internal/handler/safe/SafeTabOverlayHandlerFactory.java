@@ -20,6 +20,7 @@ package de.codecrafter47.taboverlay.bukkit.internal.handler.safe;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.injector.packet.PacketRegistry;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.bukkit.TabOverlayHandlerFactory;
@@ -95,7 +96,7 @@ public class SafeTabOverlayHandlerFactory implements TabOverlayHandlerFactory {
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            if (PacketType.hasClass(msg.getClass())) {
+            if (PacketRegistry.getPacketType(msg.getClass()) != null) {
                 val packet = PacketContainer.fromPacket(msg);
                 if (interceptedPacketTypes.contains(packet.getType())) {
                     PacketContainer clonedPacket = packet.shallowClone();
