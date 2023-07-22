@@ -19,6 +19,7 @@ package de.codecrafter47.taboverlay.bukkit.internal.handler.simple;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.injector.packet.PacketRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.taboverlay.TabView;
@@ -81,14 +82,16 @@ public class SimpleTabOverlayHandlerFactory implements TabOverlayHandlerFactory,
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            val packet = PacketContainer.fromPacket(msg);
-            if (interceptedPacketTypes.contains(packet.getType())) {
-                if (tablistHandler.onPacketSending(ctx, packet)) {
-                    super.write(ctx, packet.getHandle(), promise);
+            if (PacketRegistry.getPacketType(msg.getClass()) != null) {
+                val packet = PacketContainer.fromPacket(msg);
+                if (interceptedPacketTypes.contains(packet.getType())) {
+                    if (tablistHandler.onPacketSending(ctx, packet)) {
+                        super.write(ctx, packet.getHandle(), promise);
+                    }
+                    return;
                 }
-            } else {
-                super.write(ctx, msg, promise);
             }
+            super.write(ctx, msg, promise);
         }
     }
 }
