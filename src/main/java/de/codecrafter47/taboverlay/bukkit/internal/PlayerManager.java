@@ -64,7 +64,7 @@ public class PlayerManager implements PlayerProvider {
                 }
                 player.onDisconnect();
             } else {
-                throw new IllegalStateException("Player " + bukkitPlayer + " not contained in playerMap");
+                plugin.getLogger().log(Level.WARNING, "Player " + bukkitPlayer + " not contained in playerMap");
             }
         });
     }
