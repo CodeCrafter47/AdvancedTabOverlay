@@ -63,16 +63,16 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
-    testCompileOnly 'org.projectlombok:lombok:1.18.20'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     compileOnly "com.google.code.findbugs:jsr305:3.0.1"
     compileOnly "org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT"
     compileOnly "io.netty:netty-all:4.1.9.Final"
-    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "5.0.0-SNAPSHOT"
-    compileOnly "me.clip:placeholderapi:2.11.2"
+    compileOnly 'com.comphenix.protocol:ProtocolLib:5.4.0'
+    compileOnly "me.clip:placeholderapi:2.11.6"
     implementation "de.codecrafter47.taboverlay:taboverlaycommon-api:1.0-SNAPSHOT"
     implementation "de.codecrafter47.taboverlay:taboverlaycommon-config:1.0-SNAPSHOT"
     implementation "de.codecrafter47.data:api:1.0.2-SNAPSHOT"
