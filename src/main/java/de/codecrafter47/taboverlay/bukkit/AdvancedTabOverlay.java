@@ -23,12 +23,14 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerOptions;
 import com.comphenix.protocol.events.ListeningWhitelist;
 import com.comphenix.protocol.events.PacketListener;
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.bukkit.internal.*;
 import de.codecrafter47.taboverlay.bukkit.internal.config.MainConfig;
 import de.codecrafter47.taboverlay.bukkit.internal.config.PlayersByWorldComponentConfiguration;
+import de.codecrafter47.taboverlay.bukkit.internal.handler.ordered.OrderedTabOverlayHandlerFactory;
 import de.codecrafter47.taboverlay.bukkit.internal.handler.safe.SafeTabOverlayHandlerFactory;
 import de.codecrafter47.taboverlay.bukkit.internal.handler.simple.SimpleTabOverlayHandlerFactory;
 import de.codecrafter47.taboverlay.bukkit.internal.placeholders.PAPIAwarePlayerPlaceholderResolver;
@@ -95,6 +97,7 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
     private Yaml yaml;
     
     private boolean is1193;
+    private boolean is1214;
 
     @Override
     public void onLoad() {
@@ -120,10 +123,13 @@ public class AdvancedTabOverlay extends JavaPlugin implements Listener {
         
         is1193 = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO).getPlayerInfoActions().size() > 0;
 
+        is1214 = EnumWrappers.PlayerInfoAction.values().length >= 9;
+
         if (is1193) {
             tabOverlayHandlerFactory = new SimpleTabOverlayHandlerFactory();
+        } else if (is1214) {
+            tabOverlayHandlerFactory = new OrderedTabOverlayHandlerFactory();
         } else {
-            //tabOverlayHandlerFactory = new AggressiveTabOverlayHandlerFactory(this);
             tabOverlayHandlerFactory = new SafeTabOverlayHandlerFactory();
         }
 
